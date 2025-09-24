@@ -1,0 +1,1 @@
+set guifont=FiraMono_Nerd_Font_Mono:h14
