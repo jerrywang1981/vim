@@ -25,3 +25,5 @@ replay_pid*
 autoload
 plugged
 session
+filelist
+.netrwhist

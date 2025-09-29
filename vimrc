@@ -55,6 +55,7 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-repeat'
 Plug 'wellle/targets.vim'
+"Plug 'tpope/vim-vinegar'
 Plug 'kshenoy/vim-signature'
 Plug 'airblade/vim-rooter'
 
@@ -71,7 +72,7 @@ Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 Plug 'itchyny/vim-gitbranch'
 Plug 'airblade/vim-gitgutter'
-Plug 'mattn/emmet-vim', { 'for': ['html', 'css'] }
+Plug 'mattn/emmet-vim', { 'for': ['html', 'htmlangular','css'] }
 Plug 'nicwest/vim-http', { 'for': ['http'] }
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 "Plug 'fatih/vim-go', { 'tag': '*' }
@@ -94,16 +95,27 @@ Plug 'prabirshrestha/asyncomplete-lsp.vim'
 Plug 'prabirshrestha/asyncomplete-buffer.vim'
 Plug 'prabirshrestha/asyncomplete-file.vim'
 
+" snippets
+Plug 'rafamadriz/friendly-snippets'
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ'
+
+" Plug 'bleakwind/vim-filelist', { 'on': 'FilelistToggle' }
+
 " linter
-Plug 'rhysd/vim-lsp-ale'
-Plug 'dense-analysis/ale'
+" Plug 'rhysd/vim-lsp-ale'
+" Plug 'dense-analysis/ale'
 
 if has('python3')
   Plug 'puremourning/vimspector'
 endif
 
+if has('sound')
+  Plug 'jerrywang1981/vim-keystroke'
+endif
+
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
-Plug 'jerrywang1981/vim-keystroke'
+
 Plug 'liuchengxu/vim-which-key'
 
 " Initialize plugin system
@@ -173,6 +185,10 @@ set shiftwidth=2
 let g:loaded_netrw       = 1
 let g:loaded_netrwPlugin = 1
 
+" let g:netrw_liststyle= 3
+" let g:netrw_banner = 0
+" let g:netrw_winsize = 25
+
 " if !has('gui_running')
 "   set t_Co=256
 "   set t_ut=
@@ -210,7 +226,7 @@ set background=dark
 colorscheme catppuccin_mocha
 "colorscheme elflord
 "colorscheme quiet
-" colorscheme industry 
+" colorscheme industry
 
 
 tnoremap <Esc> <C-\><C-n>
@@ -248,6 +264,8 @@ inoremap kj <esc>
 
 " nerdtree
 map <silent> <space>1 :NERDTreeToggle<cr>
+" map <silent> <space>1 <cmd>FilelistToggle<cr>
+" map <silent> <space>1 :Lex<cr>
 
 
 " vim-fugitive
@@ -343,7 +361,7 @@ endfunction
 function! <SID>SaveSession(...)
   if a:0 == 0
     execute 'SSave! ' . GetUniqueSessionName()
-  else 
+  else
     execute 'SSave! ' . a:1
   endif
 endfunction
@@ -362,7 +380,7 @@ let g:lightline#bufferline#enable_devicons = 1
 
 function <SID>GoToBuffer()
   let l:buf = str2nr(input("Which buffer:"))
-  if l:buf > 0 
+  if l:buf > 0
     call lightline#bufferline#go(l:buf)
   endif
 endfunction
@@ -380,30 +398,71 @@ nmap <space>b8 <Plug>lightline#bufferline#go(8)
 nmap <space>b9 <Plug>lightline#bufferline#go(9)
 nmap <space>b0 <Plug>lightline#bufferline#go(10)
 
-" nmap <Leader>1 <Plug>lightline#bufferline#go(1)
-" nmap <Leader>2 <Plug>lightline#bufferline#go(2)
-" nmap <Leader>3 <Plug>lightline#bufferline#go(3)
-" nmap <Leader>4 <Plug>lightline#bufferline#go(4)
-" nmap <Leader>5 <Plug>lightline#bufferline#go(5)
-" nmap <Leader>6 <Plug>lightline#bufferline#go(6)
-" nmap <Leader>7 <Plug>lightline#bufferline#go(7)
-" nmap <Leader>8 <Plug>lightline#bufferline#go(8)
-" nmap <Leader>9 <Plug>lightline#bufferline#go(9)
-" nmap <Leader>0 <Plug>lightline#bufferline#go(10)
-
 " vim-highlightedyank
 let g:highlightedyank_highlight_duration = 500
 
 " editorconfig
 let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
-au! FileType gitcommit let b:EditorConfig_disable = 1
+au! FileType gitcommit,nerdtree let b:EditorConfig_disable = 1
 
-" vimscript 
+function! s:create_editorconfig()
+  let l:config = fnamemodify(expand($HOME . '/.editorconfig'), ':p')
+  if exists(l:config)
+    echom "The file " . l:config . " exists."
+    return
+  endif
+  let l:text = [
+        \ "# EditorConfig is awesome: https://EditorConfig.org",
+        \ "",
+        \ "# top-most EditorConfig file",
+        \ "root = true",
+        \ "",
+        \ "# Unix-style newlines with a newline ending every file",
+        \ "[*]",
+        \ "charset = utf-8",
+        \ "indent_style = space",
+        \ "end_of_line = lf",
+        \ "indent_size = 2",
+        \ "insert_final_newline = true",
+        \ "trim_trailing_whitespace = true",
+        \ "",
+        \ "",
+        \ "# 4 space indentation",
+        \ "[*.py]",
+        \ "indent_size = 4",
+        \ "",
+        \ "[*.java]",
+        \ "indent_size = 2",
+        \ "",
+        \ "[*.rs]",
+        \ "indent_size = 4",
+        \ "",
+        \ "# Tab indentation (no size specified)",
+        \ "[Makefile]",
+        \ "indent_style = tab",
+        \ "",
+        \ "# Indentation override for all JS under lib directory",
+        \ "[lib/**.js]",
+        \ "indent_style = space",
+        \ "indent_size = 2",
+        \ "",
+        \ "# Matches the exact files either package.json or .travis.yml",
+        \ "[{package.json,.travis.yml}]",
+        \ "indent_style = space",
+        \ "indent_size = 2",
+        \ ]
+  call writefile(l:text, l:config)
+  echom "The file " . l:config . " was created"
+endfunction
+
+command! -nargs=0 CreateEditorConfig call s:create_editorconfig()
+
+" vimscript
 au! FileType vim nmap <buffer> <leader>= gg=G''
 
 " emmet-vim
 let g:user_emmet_install_global = 0
-autocmd FileType html,css EmmetInstall
+autocmd FileType html,htmlangular,css EmmetInstall
 
 " vim-sneak
 let g:sneak#label = 1
@@ -445,7 +504,7 @@ function! RgRunner(...)
   let command = 'rg --column --line-number --no-heading --color=always --smart-case '
   if a:0 == 1
     return command . ' -- ' . a:1
-  endif 
+  endif
 
   let args = copy(a:000)
   let sArgs = split(join(args, ' '), ' -- ')
@@ -472,10 +531,6 @@ let g:neoformat_enabled_typescript = ['prettier']
 let g:neoformat_enabled_html = ['prettier']
 let g:neoformat_enabled_markdown = ['prettier']
 nmap <leader>= <cmd>Neoformat<CR>
-"
-" neoterm
-" let g:neoterm_default_mod = 'belowright'
-" nnoremap <silent> <space>4 :<c-u>Ttoggle<cr><C-w>j
 
 " vim-floaterm
 "let g:floaterm_wintype = 'vsplit'
@@ -483,17 +538,60 @@ let g:floaterm_keymap_new = "<leader>fc"
 let g:floaterm_keymap_prev = "<leader>fp"
 let g:floaterm_keymap_next = "<leader>fn"
 let g:floaterm_keymap_toggle = "<space>4"
-let g:floaterm_width = 0.9
-let g:floaterm_height = 0.9
+let g:floaterm_width = 0.95
+let g:floaterm_height = 0.95
 
 nnoremap <silent> <leader>fSl <cmd>FloatermSend<cr>
 vnoremap <silent> <leader>fSl <cmd>FloatermSend<cr>
 
-" vimwiki
-"let g:vimwiki_list = [{'path': '~/.vim/vimwiki/',
-"                      \ 'syntax': 'markdown', 'ext': '.md'}]
-"let g:vimwiki_global_ext = 0
+"big files
 
+function! s:check_big_file(uri, bufnr)
+  if empty(a:uri) || empty(a:bufnr)
+    return
+  else
+    let l:bufnr = str2nr(a:bufnr)
+    let l:ft = getbufvar(l:bufnr, '&filetype', '')
+    if l:ft == 'bigfile'
+      return
+    endif
+    let l:bufname = bufname(l:bufnr)
+    if l:bufname != a:uri
+      return
+    endif
+    let l:size = getfsize(l:bufname)
+    if l:size <= 0
+      return
+    elseif l:size > 1.5 * 1024 * 1024
+      execute "NoMatchParen"
+      call setbufvar(l:bufnr, '&filetype', 'bigfile')
+      call setbufvar(l:bufnr, '&syntax', l:ft)
+      call setbufvar(l:bufnr, '&foldmethod', 'manual')
+      call setbufvar(l:bufnr, '&conceallevel', 0)
+      call setbufvar(l:bufnr, '&wrap', v:false)
+      call setbufvar(l:bufnr, '&foldenable', v:false)
+    else
+      let l:bufinfo = getbufinfo(l:bufname)
+      if empty(l:bufinfo)
+        return
+      endif
+      if l:bufinfo[0].linecount > 2000
+        execute "NoMatchParen"
+        call setbufvar(l:bufnr, '&filetype', 'bigfile')
+        call setbufvar(l:bufnr, '&syntax', l:ft)
+        call setbufvar(l:bufnr, '&foldmethod', 'manual')
+        call setbufvar(l:bufnr, '&conceallevel', 0)
+        call setbufvar(l:bufnr, '&wrap', v:false)
+        call setbufvar(l:bufnr, '&foldenable', v:false)
+      endif
+    endif
+  endif
+endfunction
+
+augroup bigfile
+  au!
+  autocmd FileType * call s:check_big_file(expand("<afile>"), expand("<abuf>"))
+augroup END
 
 "undotree
 let g:undotree_DiffAutoOpen = 1
@@ -504,10 +602,10 @@ let g:undotree_DiffpanelHeight = 8
 let g:undotree_SplitWidth = 24
 nnoremap <silent> <space>7 <cmd>UndotreeToggle<cr>
 
-" vim-keystroke 
+" vim-keystroke
 "valid theme: 'default', 'bubble', 'mario', 'sword', 'typewriter'
-let g:keystroke_theme = 'typewriter' 
 if has('sound')
+  let g:keystroke_theme = 'typewriter'
   autocmd VimEnter * KeyStrokeEnable
 endif
 
@@ -519,77 +617,105 @@ let g:AutoPairsShortcutJump=''
 let g:AutoPairsMapCh=''
 let g:AutoPairsShortcutBackInsert=''
 
-"ultisnip
-" let g:UltiSnipsEditSplit="vertical"
-
 let g:lsp_settings = {
+      \  'typescript-language-server': {
+      \     'root_uri_patterns': ['.git']
+      \  },
       \  'eclipse-jdt-ls': {
       "\      'initialization_options': { 'bundles': [expand('~/com.microsoft.java.debug.plugin-0.35.jar')] }
-      \      'initialization_options': { 'bundles': glob( expand(data_dir) . 'plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar') }
-      \  },
-      \ }
+      \   'initialization_options': {
+      \     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
+      \     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1),
+      "\             + glob(data_dir . '/com.microsoft.jdtls.ext.core-*.jar', 1, 1),
+      \     'settings': {
+      \       'java': {
+      \         'maven': { 'downloadSources': v:true },
+      \         'eclipse': { 'downloadSources': v:true },
+      \         'references': { 'includeDecompiledSources': v:true },
+      \         'contentProvider': { 'preferred': 'fernflower'}
+      \         }
+      \       }
+      \     }
+      \   }
+      \  }
 
-function! <SID>StartJavaDebug() abort
-  let l:command_name =  'vscode.java.startDebugSession' 
-  let l:server_name = 'eclipse-jdt-ls'
-  let l:bufnr = -1 
-  let l:sync = v:true  ""get(a:params, 'sync', v:true)
-
-  " create command.
-  let l:command = { 'command': l:command_name }
-
-  let l:servers = lsp#get_allowed_servers()
-  " execute command on server.
-  if !empty(l:server_name)
-    call lsp#send_request(l:server_name, {
-          \   'method': 'workspace/executeCommand',
-          \   'params': l:command,
-          \   'sync': l:sync,
-          \   'on_notification': function('s:handle_execute_command', [l:server_name, l:command]),
-          \ })
-  endif
-endfunction
-
-function! s:handle_execute_command(server_name, command, data) abort
-  if lsp#client#is_error(a:data['response'])
-    call lsp#utils#error('Execute command failed on ' . a:server_name . ': ' . string(a:command) . ' -> ' . string(a:data))
-  endif
-  let l:dap_port = a:data['response']['result']
-  " call vimspector#LaunchWithSettings( { 'DAPPort': l:dap_port  }  )
-  call vimspector#Launch(v:false, { 'DAPPort': l:dap_port  }, 
-        \ {
-        \    "Java Attach": {
-        \      "adapter": "vscode-java",
-        \      "filetypes": [
-        \        "java"
-        \      ],
-        \      "configuration": {
-        \        "request": "attach",
-        \        "hostName": "127.0.0.1",
-        \        "port": "5005",
-        \        "sourcePaths": [
-        \          "${workspaceRoot}/src/main/java",
-        \          "${workspaceRoot}/src/test/java"
-        \        ],
-        \        "breakpoints": {
-        \          "exception": {
-        \            "caught": "N",
-        \            "uncaught": "N"
-        \          }
-        \        }
-        \      }
-        \    }
-        \}  
-        \)
-endfunction
 
 if has('python3')
   " vimspector
   let g:vimspector_enable_mappings = 'HUMAN'
   let g:vimspector_java_hotcodereplace_mode = 'always'
 
+  function! <SID>StartJavaDebug() abort
+    let l:command_name =  'vscode.java.startDebugSession'
+    let l:server_name = 'eclipse-jdt-ls'
+    let l:bufnr = -1
+    let l:sync = v:true  "get(a:params, 'sync', v:true)
+
+    " create command.
+    let l:command = { 'command': l:command_name }
+
+    let l:servers = lsp#get_allowed_servers()
+    " execute command on server.
+    if !empty(l:server_name)
+      call lsp#send_request(l:server_name, {
+            \   'method': 'workspace/executeCommand',
+            \   'params': l:command,
+            \   'sync': l:sync,
+            \   'on_notification': function('s:handle_execute_command', [l:server_name, l:command]),
+            \ })
+    endif
+  endfunction
+
+  function! s:handle_execute_command(server_name, command, data) abort
+    if lsp#client#is_error(a:data['response'])
+      call lsp#utils#error('Execute command failed on ' . a:server_name . ': ' . string(a:command) . ' -> ' . string(a:data))
+    endif
+    let l:dap_port = a:data['response']['result']
+    call vimspector#Launch(v:false, { 'DAPPort': l:dap_port  },
+          \ {
+          \    "Java Attach": {
+          \      "adapter": "vscode-java",
+          \      "filetypes": [
+          \        "java"
+          \      ],
+          \      "configuration": {
+          \        "request": "attach",
+          \        "hostName": "127.0.0.1",
+          \        "port": "5005",
+          \        "sourcePaths": [
+          \          "${workspaceRoot}/src/main/java",
+          \          "${workspaceRoot}/src/test/java"
+          \        ],
+          \        "breakpoints": {
+          \          "exception": {
+          \            "caught": "N",
+          \            "uncaught": "N"
+          \          }
+          \        }
+          \      }
+          \    }
+          \}
+          \)
+  endfunction
+
   autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
 endif
+
+" vim-filelist
+" " Set 1 enable filelist (default: 0)
+" let g:filelist_enabled = 1
+" " Set 1 autostart filelist (default: 0)
+" " let g:filelist_autostart = 1
+" " Position of the filelist window: 'left' or 'right' (default: 'left')
+" let g:filelist_position = 'left'
+" " Width of the filelist window (default: 30)
+" let g:filelist_winwidth = 30
+" " Default directory to show (default: getcwd())
+" let g:filelist_mainpath = getcwd()
+" " Set 1 Show hidden files (default: 0)
+" let g:filelist_showhide = 0
+" " Set Bookmark place (default: $HOME.'/.vim/filelist')
+" let g:filelist_datapath = data_dir . '/filelist'
 
 " quickfix window
 
@@ -613,7 +739,7 @@ function! s:qf_delete(line1, line2)
   if len(l:list) > 0
     call execute(l:lines[0] > len(l:list) ? len(l:list) : l:lines[0])
   endif
-endfunction 
+endfunction
 
 function! s:on_qf_open() abort
   command! -buffer -range -nargs=0 QfDelete call s:qf_delete(<line1>, <line2>)
@@ -624,13 +750,21 @@ endfunction
 autocmd FileType qf call s:on_qf_open()
 
 " LSP config
-let g:lsp_diagnostics_enabled = 0         " disable diagnostics support
+" let g:lsp_diagnostics_enabled = 0         " disable diagnostics support
 let g:lsp_fold_enabled = 0
 let g:lsp_format_sync_timeout = 1000
 let g:lsp_inlay_hints_enabled = 1
 
-"let g:lsp_log_verbose = 1
-"let g:lsp_log_file = expand('~/vim-lsp.log')
+let g:lsp_document_code_action_signs_hint = {'text': '🚀'}
+let g:lsp_diagnostics_signs_error = {'text': '🚨'}
+let g:lsp_diagnostics_signs_warning = {'text': '⚠️' }
+let g:lsp_diagnostics_signs_hint = {'text': '💡'}
+let g:lsp_diagnostics_signs_information = {'text': 'ℹ️'}
+let g:lsp_diagnostics_virtual_text_enabled = 1
+let g:lsp_diagnostics_virtual_text_align = "right"
+
+" let g:lsp_log_verbose = 1
+" let g:lsp_log_file = expand('~/vim-lsp.log')
 
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
@@ -712,11 +846,11 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
       \ }))
 
 " disable auto enabled linter
-let g:lsp_ale_auto_enable_linter = v:false
-let g:ale_linters = {
-      "\ 'javascript': ['vim-lsp', 'eslint'],
-      "\ 'typescript': ['vim-lsp', 'tslint'],
-      \ }
+" let g:lsp_ale_auto_enable_linter = v:false
+" let g:ale_linters = {
+"\ 'javascript': ['vim-lsp', 'eslint'],
+"\ 'typescript': ['vim-lsp', 'tslint'],
+" \ }
 
 
 " vim-lsp-settings
@@ -740,12 +874,15 @@ command! -nargs=0 FormatDisable call <SID>UnmapFormat()
 
 " <space> key map to enable / disable stuff
 nnoremap <silent> <space>df <cmd>FormatDisable<cr>
-nnoremap <silent> <space>el <cmd>ALEEnable<cr>
-nnoremap <silent> <space>dl <cmd>ALEDisable<cr>
+" nnoremap <silent> <space>el <cmd>ALEEnable<cr>
+" nnoremap <silent> <space>dl <cmd>ALEDisable<cr>
 
 " <space> key map to toggle stuff
-nnoremap <silent> <space>tm <cmd>MarkdownPreviewToggle<cr>
-nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
+
+if has('sound')
+  nnoremap <silent> <space>tm <cmd>MarkdownPreviewToggle<cr>
+  nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
+endif
 
 " abbreviation
 iab jw Jerry Wang <jerrywang1981@outlook.com>
