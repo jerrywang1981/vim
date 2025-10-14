@@ -407,7 +407,7 @@ au! FileType gitcommit,nerdtree let b:EditorConfig_disable = 1
 
 function! s:create_editorconfig()
   let l:config = fnamemodify(expand($HOME . '/.editorconfig'), ':p')
-  if exists(l:config)
+  if filereadable(l:config)
     echom "The file " . l:config . " exists."
     return
   endif
@@ -456,6 +456,30 @@ function! s:create_editorconfig()
 endfunction
 
 command! -nargs=0 CreateEditorConfig call s:create_editorconfig()
+
+function! s:create_git_config()
+  let l:config = fnamemodify(expand($HOME . '/.gitconfig'), ':p')
+  if filereadable(l:config)
+    echom "The file " . l:config . " exists."
+    return
+  endif
+  let l:text = [
+        \ "[user]",
+        \ "    name = Jerry Wang",
+        \ "    email = jerrywang1981@outlook.com",
+        \ "    signingkey = jerrywang1981@outlook.com",
+        \ "[commit]",
+        \ "    gpgsign = true",
+        \ "[tag]",
+        \ "    gpgsign = true",
+        \ "[pull]",
+        \ "    rebase = true",
+        \ ]
+  call writefile(l:text, l:config)
+  echom "The file " . l:config . " was created"
+endfunction
+
+command! -nargs=0 CreateGitConfig call s:create_git_config()
 
 " vimscript
 au! FileType vim nmap <buffer> <leader>= gg=G''
@@ -575,7 +599,7 @@ function! s:check_big_file(uri, bufnr)
       if empty(l:bufinfo)
         return
       endif
-      if l:bufinfo[0].linecount > 2000
+      if l:bufinfo[0].linecount > 20000
         execute "NoMatchParen"
         call setbufvar(l:bufnr, '&filetype', 'bigfile')
         call setbufvar(l:bufnr, '&syntax', l:ft)
@@ -620,23 +644,22 @@ let g:AutoPairsShortcutBackInsert=''
 let g:lsp_settings = {
       \  'typescript-language-server': {
       \     'root_uri_patterns': ['.git']
-      \  },
-      \  'eclipse-jdt-ls': {
-      "\      'initialization_options': { 'bundles': [expand('~/com.microsoft.java.debug.plugin-0.35.jar')] }
-      \   'initialization_options': {
-      \     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
-      \     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1),
-      "\             + glob(data_dir . '/com.microsoft.jdtls.ext.core-*.jar', 1, 1),
-      \     'settings': {
-      \       'java': {
-      \         'maven': { 'downloadSources': v:true },
-      \         'eclipse': { 'downloadSources': v:true },
-      \         'references': { 'includeDecompiledSources': v:true },
-      \         'contentProvider': { 'preferred': 'fernflower'}
-      \         }
-      \       }
-      \     }
-      \   }
+      \  }
+      "\  'eclipse-jdt-ls': {
+      "\   'initialization_options': {
+      "\     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
+      "\     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1),
+      "\     'settings': {
+      "\       'java': {
+      "\         'maven': { 'downloadSources': v:true },
+      "\         'eclipse': { 'downloadSources': v:true },
+      "\         'references': { 'includeDecompiledSources': v:true },
+      "\         'contentProvider': { 'preferred': 'fernflower'}
+      "\         }
+      "\       }
+      "\     },
+      "\   'root_uri': '.gitignore'
+      "\   }
       \  }
 
 
