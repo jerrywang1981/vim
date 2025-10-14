@@ -76,7 +76,7 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'htmlangular','css'] }
 Plug 'nicwest/vim-http', { 'for': ['http'] }
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 "Plug 'fatih/vim-go', { 'tag': '*' }
-Plug 'catppuccin/vim', { 'as': 'catppuccin' }
+" Plug 'catppuccin/vim', { 'as': 'catppuccin' }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install()  }  }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/gv.vim', { 'on': 'GV' }
@@ -223,11 +223,14 @@ if has("wildignore") == 1 && has("popupwin") == 1
 endif
 
 set background=dark
-colorscheme catppuccin_mocha
+" colorscheme catppuccin_mocha
 "colorscheme elflord
 "colorscheme quiet
-" colorscheme industry
+colorscheme industry
 
+hi CursorLine guibg=#313244
+hi ColorColumn guibg=#313244
+hi CursorColumn guibg=#181825
 
 tnoremap <Esc> <C-\><C-n>
 tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
@@ -273,9 +276,9 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 
 " lightline
 let g:lightline = {
-      \ 'colorscheme': 'catppuccin_mocha',
+      "\ 'colorscheme': 'catppuccin_mocha',
       "\ 'colorscheme': 'jellybeans',
-      "\ 'colorscheme': 'wombat',
+      \ 'colorscheme': 'wombat',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'modified', 'jerry', 'filename' ] ]
