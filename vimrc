@@ -228,10 +228,6 @@ colorscheme catppuccin_mocha
 "colorscheme quiet
 " colorscheme industry
 
-" hi CursorLine guibg=#313244
-" hi ColorColumn guibg=#313244
-" hi CursorColumn guibg=#181825
-
 tnoremap <Esc> <C-\><C-n>
 tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 
@@ -647,8 +643,8 @@ let g:AutoPairsShortcutBackInsert=''
 let g:lsp_settings = {
       \  'typescript-language-server': {
       \     'root_uri_patterns': ['.git']
-      \  }
-      "\  'eclipse-jdt-ls': {
+      \  },
+      \ 'eclipse-jdt-ls': {
       "\   'initialization_options': {
       "\     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
       "\     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1),
@@ -661,8 +657,8 @@ let g:lsp_settings = {
       "\         }
       "\       }
       "\     },
-      "\   'root_uri': '.gitignore'
-      "\   }
+      \     'root_uri_patterns': ['.git']
+      \   }
       \  }
 
 
@@ -883,6 +879,8 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
 " java 21
 " install-eclipse-jdt-ls.cmd
 " curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.33.0/jdt-language-server-1.33.0-202402151717.tar.gz"
+" java 17
+" curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.30.1/jdt-language-server-1.30.1-202312071447.tar.gz"
 "
 "
 "
