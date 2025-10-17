@@ -491,7 +491,8 @@ autocmd FileType html,htmlangular,css EmmetInstall
 let g:sneak#label = 1
 
 " vim-rooter
-let g:rooter_silent_chdir = 1
+let g:rooter_silent_chdir = 0
+let g:rooter_patterns = ['.git']
 
 " fzf
 nnoremap <silent> <C-p> <cmd>GFiles<CR>
