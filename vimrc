@@ -55,7 +55,6 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-repeat'
 Plug 'wellle/targets.vim'
-"Plug 'tpope/vim-vinegar'
 Plug 'kshenoy/vim-signature'
 Plug 'airblade/vim-rooter'
 
@@ -76,7 +75,8 @@ Plug 'mattn/emmet-vim', { 'for': ['html', 'htmlangular','css'] }
 Plug 'nicwest/vim-http', { 'for': ['http'] }
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 "Plug 'fatih/vim-go', { 'tag': '*' }
-Plug 'catppuccin/vim', { 'as': 'catppuccin' }
+" Plug 'catppuccin/vim', { 'as': 'catppuccin' }
+" Plug 'NLKNguyen/papercolor-theme'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install()  }  }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/gv.vim', { 'on': 'GV' }
@@ -89,6 +89,7 @@ Plug 'sbdchd/neoformat'
 Plug 'justinmk/vim-sneak'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
+
 " completion
 Plug 'prabirshrestha/asyncomplete.vim'
 Plug 'prabirshrestha/asyncomplete-lsp.vim'
@@ -223,10 +224,19 @@ if has("wildignore") == 1 && has("popupwin") == 1
 endif
 
 set background=dark
-colorscheme catppuccin_mocha
+colorscheme desert
+" colorscheme evening
 "colorscheme elflord
 "colorscheme quiet
 " colorscheme industry
+" try
+"   colorscheme PaperColor
+" catch /.*/
+"   colorscheme desert
+" endtry
+
+" highlight ColorColumn guibg=#666666
+highlight EndOfBuffer guifg=bg
 
 tnoremap <Esc> <C-\><C-n>
 tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
@@ -272,9 +282,7 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 
 " lightline
 let g:lightline = {
-      \ 'colorscheme': 'catppuccin_mocha',
-      "\ 'colorscheme': 'jellybeans',
-      "\ 'colorscheme': 'wombat',
+      \ 'colorscheme': 'wombat',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
       \             [ 'gitbranch', 'readonly', 'modified', 'jerry', 'filename' ] ]
@@ -304,8 +312,7 @@ let g:startify_change_to_dir=0
 let g:startify_files_number=5
 let g:startify_enable_special=0
 let g:startify_lists = [
-      \ { 'type' : 'files', 'header' : [ "   MRU" ] },
-      "\ { 'type': 'sessions',  'header': ['   Sessions']       },
+      \ { 'type' : 'files', 'header' : [ "   MRU" ] }
       \ ]
 
 let g:startify_custom_header =
@@ -401,8 +408,75 @@ nmap <space>b0 <Plug>lightline#bufferline#go(10)
 let g:highlightedyank_highlight_duration = 500
 
 " editorconfig
+
 let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
-au! FileType gitcommit,nerdtree let b:EditorConfig_disable = 1
+autocmd FileType gitcommit,nerdtree let b:EditorConfig_disable = 1
+
+
+" https://github.com/suy/vim-context-commentstring
+" the follow code was taken from above website
+let g:comment_table = {
+      \ 'vue': {
+			\   'htmlTag': 's:<!--,m:    ,e:-->',
+			\   'vue_typescript': 's1:/*,mb:*,ex:*/,://',
+			\   'cssStyle': 's1:/*,mb:*,ex:*/,://',
+      \   }
+      \ }
+let g:commentstring_table = {
+      \ 'vue': {
+      \   'javaScript'  : '//%s',
+      \   'cssStyle'    : '/*%s*/',
+      \   'vue_scss'    : '/*%s*/',
+      \   }
+      \ }
+
+function! <SID>UpdateComments()
+  let stack = synstack(line('.'), col('.'))
+  call reverse(stack)
+  if !empty(stack)
+    for name in map(stack, 'synIDattr(v:val, "name")')
+      if has_key(g:comment_table[&filetype], name)
+        let &l:comments = g:comment_table[&filetype][name]
+        return
+      endif
+    endfor
+  endif
+  let &l:comments = b:original_comments
+endfunction
+
+function! <SID>UpdateCommentString()
+  let stack = synstack(line('.'), col('.'))
+  if !empty(stack)
+    for name in map(stack, 'synIDattr(v:val, "name")')
+      if has_key(g:commentstring_table[&filetype], name)
+        let &l:commentstring = g:commentstring_table[&filetype][name]
+        return
+      endif
+    endfor
+  endif
+  let &l:commentstring = b:original_commentstring
+endfunction
+
+function! s:setup_comment()
+  augroup CommentstringEnabled
+		" Clear previous autocommands first in all cases, in case the filetype
+		" changed from something in the table, to something NOT in the table.
+		autocmd! CursorMoved <buffer>
+    if !empty(&filetype) && has_key(g:commentstring_table, &filetype)
+			let b:original_commentstring=&l:commentstring
+			autocmd CursorMoved <buffer> call <SID>UpdateCommentString()
+		endif
+    if !empty(&filetype) && has_key(g:comment_table, &filetype)
+			let b:original_comments=&l:comments
+			autocmd CursorMoved <buffer> call <SID>UpdateComments()
+		endif
+	augroup END
+endfunction
+
+augroup CommentstringBootstrap
+	autocmd!
+  autocmd FileType vue call s:setup_comment()
+augroup END
 
 function! s:create_editorconfig()
   let l:config = fnamemodify(expand($HOME . '/.editorconfig'), ':p')
@@ -470,7 +544,7 @@ function! s:create_git_config()
         \ "[commit]",
         \ "    gpgsign = true",
         \ "[tag]",
-        \ "    gpgsign = true",
+        \ "    gpgSign = true",
         \ "[pull]",
         \ "    rebase = true",
         \ ]
@@ -481,7 +555,7 @@ endfunction
 command! -nargs=0 CreateGitConfig call s:create_git_config()
 
 " vimscript
-au! FileType vim nmap <buffer> <leader>= gg=G''
+autocmd FileType vim nmap <buffer> <leader>= gg=G''
 
 " emmet-vim
 let g:user_emmet_install_global = 0
@@ -641,14 +715,14 @@ let g:AutoPairsShortcutJump=''
 let g:AutoPairsMapCh=''
 let g:AutoPairsShortcutBackInsert=''
 
+" vim-lsp-settings
 let g:lsp_settings = {
       \  'typescript-language-server': {
       \     'root_uri_patterns': ['.git']
       \  },
       \ 'eclipse-jdt-ls': {
-      "\   'initialization_options': {
-      "\     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
-      "\     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1),
+      \   'initialization_options': {
+      \     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1)
       "\     'settings': {
       "\       'java': {
       "\         'maven': { 'downloadSources': v:true },
@@ -657,17 +731,21 @@ let g:lsp_settings = {
       "\         'contentProvider': { 'preferred': 'fernflower'}
       "\         }
       "\       }
-      "\     },
+      \     },
       \     'root_uri_patterns': ['.git']
       \   }
       \  }
 
+let g:lsp_settings_filetype_typescript = "vtsls"
+let g:lsp_settings_filetype_vue = ["volar-server", "vtsls"]
 
 if has('python3')
   " vimspector
   let g:vimspector_enable_mappings = 'HUMAN'
   let g:vimspector_java_hotcodereplace_mode = 'always'
 
+  " mvn spring-boot:run -D"spring-boot.run.jvmArguments"="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y"
+  " jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=5005
   function! <SID>StartJavaDebug() abort
     let l:command_name =  'vscode.java.startDebugSession'
     let l:server_name = 'eclipse-jdt-ls'
@@ -721,7 +799,8 @@ if has('python3')
           \)
   endfunction
 
-  autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
+  " autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
+  autocmd FileType java nnoremap <silent> <buffer> <F5> :call <SID>StartJavaDebug()<CR>
 endif
 
 " vim-filelist
@@ -776,7 +855,10 @@ autocmd FileType qf call s:on_qf_open()
 " let g:lsp_diagnostics_enabled = 0         " disable diagnostics support
 let g:lsp_fold_enabled = 0
 let g:lsp_format_sync_timeout = 1000
-let g:lsp_inlay_hints_enabled = 1
+" let g:lsp_inlay_hints_enabled = 1
+let g:lsp_inlay_hints_mode = {
+  \  'normal': ['curline'],
+  \}
 
 let g:lsp_document_code_action_signs_hint = {'text': '🚀'}
 let g:lsp_diagnostics_signs_error = {'text': '🚨'}
