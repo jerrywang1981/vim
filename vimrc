@@ -245,6 +245,8 @@ tnoremap <expr> <C-R> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 "-------------------------key mappings---------------------------------
 
 nmap <silent> <leader>ev :e $MYVIMRC<cr>
+nmap <silent> <leader>et <cmd>execute 'tabedit ' .. $HOME .. '/todo.md'<cr>
+nmap <silent> <leader>en <cmd>execute 'tabedit ' .. $HOME .. '/note.md'<cr>
 
 noremap <up> <Nop>
 noremap <down> <Nop>
@@ -280,12 +282,18 @@ map <silent> <space>1 :NERDTreeToggle<cr>
 " vim-fugitive
 autocmd BufReadPost fugitive://* set bufhidden=delete
 
+" git status from gitgutter
+function! GitStatus()
+  let [a,m,r] = GitGutterGetHunkSummary()
+  return printf('+%d ~%d -%d', a, m, r)
+endfunction
+
 " lightline
 let g:lightline = {
       \ 'colorscheme': 'wombat',
       \ 'active': {
       \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'modified', 'jerry', 'filename' ] ]
+      \             [ 'gitbranch', 'readonly', 'modified', 'gitstatus', 'jerry', 'filename' ] ]
       \ },
       \ 'tabline': {
       \   'left': [ ['buffers']  ],
@@ -295,7 +303,8 @@ let g:lightline = {
       \   'jerry': ' Jerry Wang'
       \ },
       \ 'component_function': {
-      \   'gitbranch': 'gitbranch#name'
+      \   'gitbranch': 'gitbranch#name',
+      \   'gitstatus': 'GitStatus'
       \ },
       \ 'component_expand': {
       \   'buffers': 'lightline#bufferline#buffers'
@@ -965,12 +974,90 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
 " java 17
 " curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.30.1/jdt-language-server-1.30.1-202312071447.tar.gz"
 "
-"
-"
+" vim-gitgutter
+" let g:gitgutter_map_keys = 0
+
+
 " vim-which-key
 nnoremap <silent> <leader>      :<c-u>WhichKey ','<CR>
 nnoremap <silent> <localleader> :<c-u>WhichKey  ','<CR>
-nnoremap <silent> <space> :<c-u>WhichKey  ' '<CR>
+nnoremap <silent> <space> :<c-u>WhichKey  '<space>'<CR>
+
+let g:which_key_map_leader = {}
+let g:which_key_map_leader.h = {
+      \'name': '+hunk',
+      \'p': 'preview',
+      \'s': 'stage',
+      \'u': 'undo',
+      \ }
+
+let g:which_key_map_leader.e = { 
+      \'name': '+edit',
+      \'v': 'Vim configuation file',
+      \'t': 'Todo list',
+      \'n': 'Note',
+      \}
+
+let g:which_key_map_leader.f = { 
+      \'name': '+fzf/floaterm',
+      \'f': 'Find files',
+      \'g': {
+      \   'name': '+grep',
+      \   'g': 'Git files',
+      \   'h': 'all files',
+      \   '/': 'Buffer lines',
+      \  }
+      \}
+
+call which_key#register(',', "g:which_key_map_leader")
+
+let g:which_key_map_space = {
+      \ '1': 'File tree',
+      \ '4': 'Terminal',
+      \ '7': 'Undo tree',
+      \ }
+let g:which_key_map_space.e = { 'name': '+enable' }
+let g:which_key_map_space.d = { 'name': '+disable' }
+let g:which_key_map_space.D = { 
+      \ 'name': '+debug',
+      \ '<F3>': 'Stop',
+      \ '<F4>': 'Restart',
+      \ '<F5>': 'Start/Continue',
+      \ '<F6>': 'Pause',
+      \ '<F8>': 'Add function breakpoint',
+      \ '<leader><F8>': 'Run to cursor',
+      \ '<F9>': 'Toggle breakpoint',
+      \ '<leader><F9>': 'Toggle conditional breakpoint',
+      \ '<F10>': 'Step over',
+      \ '<F11>': 'Step into',
+      \ '<F12>': 'Step out',
+      \ }
+
+let g:which_key_map_space.t = { 
+      \ 'name': '+toggle',
+      \ 'm': 'markdown preview',
+      \ }
+
+if has('sound')
+  let g:which_key_map_space.t.k = 'keystroke sound' 
+endif
+
+let g:which_key_map_space.b = { 
+      \'name': '+buffers',
+      \'b': 'which buffer to go',
+      \'1': 'Go to buffer 1',
+      \'2': 'Go to buffer 2',
+      \'3': 'Go to buffer 3',
+      \'4': 'Go to buffer 4',
+      \'5': 'Go to buffer 5',
+      \'6': 'Go to buffer 6',
+      \'7': 'Go to buffer 7',
+      \'8': 'Go to buffer 8',
+      \'9': 'Go to buffer 9',
+      \'0': 'Go to buffer 10',
+      \ }
+
+call which_key#register('<Space>', "g:which_key_map_space")
 
 function! <SID>UnmapFormat()
   silent! unmap <leader>=
@@ -986,8 +1073,9 @@ nnoremap <silent> <space>df <cmd>FormatDisable<cr>
 
 " <space> key map to toggle stuff
 
+nnoremap <silent> <space>tm <cmd>MarkdownPreviewToggle<cr>
+
 if has('sound')
-  nnoremap <silent> <space>tm <cmd>MarkdownPreviewToggle<cr>
   nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
 endif
 
