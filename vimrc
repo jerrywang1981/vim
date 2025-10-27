@@ -34,8 +34,9 @@ if empty(glob(data_dir . '/autoload/plug.vim'))
 endif
 
 " vim-plug
-let g:plug_timeout=360
-let g:plug_threads=4
+let g:plug_timeout = 360
+let g:plug_threads = 4
+let g:plug_shallow = 1
 
 call plug#begin()
 " The default plugin directory will be as follows:
@@ -208,7 +209,6 @@ endif
 
 if has("persistent_undo")
   let target_path = expand('~/.undo_dir')
-
   " create the directory and any parent directories
   " if the location does not exist.
   if !isdirectory(target_path)
@@ -572,6 +572,8 @@ autocmd FileType html,htmlangular,css EmmetInstall
 
 " vim-sneak
 let g:sneak#label = 1
+let g:sneak#map_netrw = 0
+let g:sneak#use_ic_scs = 1
 
 " vim-rooter
 let g:rooter_silent_chdir = 0
@@ -600,6 +602,10 @@ let g:fzf_action = {
       \ 'ctrl-v': 'vsplit'}
 
 let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
+
+if executable('fd')
+  let $FZF_DEFAULT_COMMAND = 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
+endif
 
 let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.95, 'relative': v:true  }  }
 
@@ -991,14 +997,14 @@ let g:which_key_map_leader.h = {
       \'u': 'undo',
       \ }
 
-let g:which_key_map_leader.e = { 
+let g:which_key_map_leader.e = {
       \'name': '+edit',
       \'v': 'Vim configuation file',
       \'t': 'Todo list',
       \'n': 'Note',
       \}
 
-let g:which_key_map_leader.f = { 
+let g:which_key_map_leader.f = {
       \'name': '+fzf/floaterm',
       \'f': 'Find files',
       \'g': {
@@ -1018,7 +1024,7 @@ let g:which_key_map_space = {
       \ }
 let g:which_key_map_space.e = { 'name': '+enable' }
 let g:which_key_map_space.d = { 'name': '+disable' }
-let g:which_key_map_space.D = { 
+let g:which_key_map_space.D = {
       \ 'name': '+debug',
       \ '<F3>': 'Stop',
       \ '<F4>': 'Restart',
@@ -1033,16 +1039,16 @@ let g:which_key_map_space.D = {
       \ '<F12>': 'Step out',
       \ }
 
-let g:which_key_map_space.t = { 
+let g:which_key_map_space.t = {
       \ 'name': '+toggle',
       \ 'm': 'markdown preview',
       \ }
 
 if has('sound')
-  let g:which_key_map_space.t.k = 'keystroke sound' 
+  let g:which_key_map_space.t.k = 'keystroke sound'
 endif
 
-let g:which_key_map_space.b = { 
+let g:which_key_map_space.b = {
       \'name': '+buffers',
       \'b': 'which buffer to go',
       \'1': 'Go to buffer 1',
