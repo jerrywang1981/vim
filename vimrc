@@ -605,6 +605,8 @@ let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
 
 if executable('fd')
   let $FZF_DEFAULT_COMMAND = 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
+elseif executable('fdfind')
+  let $FZF_DEFAULT_COMMAND = 'fdfind --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
 endif
 
 let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.95, 'relative': v:true  }  }
@@ -758,6 +760,11 @@ if has('python3')
   " vimspector
   let g:vimspector_enable_mappings = 'HUMAN'
   let g:vimspector_java_hotcodereplace_mode = 'always'
+
+  " for normal mode - the word under the cursor
+  nmap <Leader>di <Plug>VimspectorBalloonEval
+  " for visual mode, the visually selected text
+  xmap <Leader>di <Plug>VimspectorBalloonEval
 
   " mvn spring-boot:run -D"spring-boot.run.jvmArguments"="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y"
   " jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=5005
