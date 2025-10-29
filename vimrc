@@ -7,9 +7,11 @@
 "  \____/ \___|_|  |_|   \__| |     \/  \/ \__|_|_| |_|\__| |
 "                         __/ |                         __/ | * @jerrywang1981 github  ',
 "                        |___/                         |___/  * https://jerrywang1981.github.io  ',
-"                                                             * wangjianjun@gmail.com ',
+"                                                             * jerrywang1981@outlook.com ',
 "
 "
+
+if v:version < 801 | finish | endif
 
 let g:mapleader = ","
 let g:maplocalleader = ","
@@ -28,6 +30,11 @@ elseif g:env =~ 'LINUX'
   let data_dir = $HOME . '/.vim'
 endif
 
+" windows (powershell)
+" iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni $HOME/vimfiles/autoload/plug.vim -Force
+" linux
+" curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
 if empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
@@ -37,6 +44,17 @@ endif
 let g:plug_timeout = 360
 let g:plug_threads = 4
 let g:plug_shallow = 1
+
+try
+  packadd! hlyank
+  packadd! comment
+  packadd! editorconfig
+  packadd! matchit
+  packadd! netrw
+  packadd! nohlsearch
+  packadd! cfilter
+catch /.*/
+endtry
 
 call plug#begin()
 " The default plugin directory will be as follows:
@@ -52,28 +70,32 @@ Plug 'preservim/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-sensible'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-commentary'
+" Plug 'tpope/vim-commentary'
+if empty(globpath(&runtimepath, 'plugin/comment.vim')) | Plug 'tpope/vim-commentary' | endif
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-repeat'
 Plug 'wellle/targets.vim'
 Plug 'kshenoy/vim-signature'
 Plug 'airblade/vim-rooter'
 
-Plug 'machakann/vim-highlightedyank'
+" if v:version < 901 | Plug 'machakann/vim-highlightedyank' | endif
+if empty(globpath(&runtimepath, 'plugin/hlyank.vim')) | Plug 'machakann/vim-highlightedyank' | endif
+
 Plug 'mhinz/vim-startify'
 Plug 'jiangmiao/auto-pairs'
 
 "Plug 'elzr/vim-json', { 'for': 'json'  }
 "Plug 'honza/dockerfile.vim', { 'for': 'Dockerfile' }
 
-Plug 'editorconfig/editorconfig-vim'
+if empty(globpath(&runtimepath, 'plugin/editorconfig.vim')) | Plug 'editorconfig/editorconfig-vim' | endif
+
 Plug 'ryanoasis/vim-devicons'
 Plug 'itchyny/lightline.vim'
 Plug 'mengelbrecht/lightline-bufferline'
 Plug 'itchyny/vim-gitbranch'
 Plug 'airblade/vim-gitgutter'
-Plug 'mattn/emmet-vim', { 'for': ['html', 'htmlangular','css'] }
-Plug 'nicwest/vim-http', { 'for': ['http'] }
+Plug 'mattn/emmet-vim', { 'for': ['html', 'htmlangular','css', 'vue'] }
+" Plug 'nicwest/vim-http', { 'for': ['http'] }
 " Using a tagged release; wildcard allowed (requires git 1.9.2 or above)
 "Plug 'fatih/vim-go', { 'tag': '*' }
 " Plug 'catppuccin/vim', { 'as': 'catppuccin' }
@@ -120,6 +142,11 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': 
 
 Plug 'liuchengxu/vim-which-key'
 
+" database
+Plug 'tpope/vim-dadbod', { 'on': ['DBUI', 'DBUIToggle'] }
+Plug 'kristijanhusak/vim-dadbod-ui', { 'on': ['DBUI', 'DBUIToggle'] }
+Plug 'kristijanhusak/vim-dadbod-completion', { 'on': ['DBUI', 'DBUIToggle'] }
+
 " Initialize plugin system
 " - Automatically executes `filetype plugin indent on` and `syntax enable`.
 call plug#end()
@@ -130,7 +157,7 @@ call plug#end()
 "filetype plugin indent on   " enable loading indent file for filetype
 "syntax on                   " syntax highlighting
 
-runtime! plugin/sensible.vim
+" runtime! plugin/sensible.vim
 
 set path+=**
 set clipboard+=unnamed      " use the clipboards of vim and win
@@ -183,9 +210,12 @@ set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 
+let g:loaded_vimballPlugin = 1
+let g:loaded_tutor_mode_plugin = 1
+let g:loaded_manpager_plugin = 1
 
-let g:loaded_netrw       = 1
-let g:loaded_netrwPlugin = 1
+" let g:loaded_netrw       = 1
+" let g:loaded_netrwPlugin = 1
 
 " let g:netrw_liststyle= 3
 " let g:netrw_banner = 0
@@ -220,7 +250,10 @@ if has("persistent_undo")
 endif
 
 if has("wildignore") == 1 && has("popupwin") == 1
-  set wildoptions=pum
+  try
+    set wildoptions=pum
+  catch /.*/
+  endtry
 endif
 
 set background=dark
@@ -282,8 +315,15 @@ map <silent> <space>1 :NERDTreeToggle<cr>
 " vim-fugitive
 autocmd BufReadPost fugitive://* set bufhidden=delete
 
+" database
+let g:db_ui_use_nerd_fonts = 1
+autocmd FileType sql setlocal omnifunc=vim_dadbod_completion#omni
+nnoremap <silent> <space>td <cmd>DBUIToggle<cr>
+
 " git status from gitgutter
 function! GitStatus()
+  let l:ft = ['fugitive', 'startify', 'help']
+  if index(l:ft, &ft) >= 0 | return "" | endif
   let [a,m,r] = GitGutterGetHunkSummary()
   return printf('+%d ~%d -%d', a, m, r)
 endfunction
@@ -384,6 +424,11 @@ endfunction
 command! -nargs=? SessionSave call <SID>SaveSession(<f-args>)
 command! -nargs=? SessionLoad execute 'SLoad ' . GetUniqueSessionName()
 command! -bang -nargs=0 Sessions call fzf#vim#files(startify#get_session_path(), {'sink*': function('s:SessionLoadFunction')}, <bang>0)
+
+" vim-http
+" let g:vim_http_split_vertically = 1
+" let g:vim_http_right_below = 1
+" let g:vim_http_tempbuffer = 1
 
 " lightline-bufferline
 let g:lightline#bufferline#show_number = 3
@@ -740,20 +785,12 @@ let g:lsp_settings = {
       \ 'eclipse-jdt-ls': {
       \   'initialization_options': {
       \     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1)
-      "\     'settings': {
-      "\       'java': {
-      "\         'maven': { 'downloadSources': v:true },
-      "\         'eclipse': { 'downloadSources': v:true },
-      "\         'references': { 'includeDecompiledSources': v:true },
-      "\         'contentProvider': { 'preferred': 'fernflower'}
-      "\         }
-      "\       }
       \     },
       \     'root_uri_patterns': ['.git']
       \   }
       \  }
 
-let g:lsp_settings_filetype_typescript = "vtsls"
+let g:lsp_settings_filetype_typescript = ["vtsls", "typescript-language-server"]
 let g:lsp_settings_filetype_vue = ["volar-server", "vtsls"]
 
 if has('python3')
@@ -766,8 +803,9 @@ if has('python3')
   " for visual mode, the visually selected text
   xmap <Leader>di <Plug>VimspectorBalloonEval
 
-  " mvn spring-boot:run -D"spring-boot.run.jvmArguments"="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y"
-  " jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=5005
+  nmap <space>Dtb <Plug>VimspectorBreakpoints
+  nmap <space>Dtc <cmd>VimspectorShowOutput<cr>
+
   function! <SID>StartJavaDebug() abort
     let l:command_name =  'vscode.java.startDebugSession'
     let l:server_name = 'eclipse-jdt-ls'
@@ -821,8 +859,8 @@ if has('python3')
           \)
   endfunction
 
-  " autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
-  autocmd FileType java nnoremap <silent> <buffer> <F5> :call <SID>StartJavaDebug()<CR>
+  autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
+  " autocmd FileType java nnoremap <silent> <buffer> <F5> :call <SID>StartJavaDebug()<CR>
 endif
 
 " vim-filelist
@@ -890,8 +928,8 @@ let g:lsp_diagnostics_signs_information = {'text': 'ℹ️'}
 let g:lsp_diagnostics_virtual_text_enabled = 1
 let g:lsp_diagnostics_virtual_text_align = "right"
 
-" let g:lsp_log_verbose = 1
-" let g:lsp_log_file = expand('~/vim-lsp.log')
+let g:lsp_log_verbose = 1
+let g:lsp_log_file = expand('~/vim-lsp.log')
 
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
@@ -980,12 +1018,6 @@ au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#source
 " \ }
 
 
-" vim-lsp-settings
-" java 21
-" install-eclipse-jdt-ls.cmd
-" curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.33.0/jdt-language-server-1.33.0-202402151717.tar.gz"
-" java 17
-" curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.30.1/jdt-language-server-1.30.1-202312071447.tar.gz"
 "
 " vim-gitgutter
 " let g:gitgutter_map_keys = 0
@@ -1031,27 +1063,38 @@ let g:which_key_map_space = {
       \ }
 let g:which_key_map_space.e = { 'name': '+enable' }
 let g:which_key_map_space.d = { 'name': '+disable' }
-let g:which_key_map_space.D = {
-      \ 'name': '+debug',
-      \ '<F3>': 'Stop',
-      \ '<F4>': 'Restart',
-      \ '<F5>': 'Start/Continue',
-      \ '<F6>': 'Pause',
-      \ '<F8>': 'Add function breakpoint',
-      \ '<leader><F8>': 'Run to cursor',
-      \ '<F9>': 'Toggle breakpoint',
-      \ '<leader><F9>': 'Toggle conditional breakpoint',
-      \ '<F10>': 'Step over',
-      \ '<F11>': 'Step into',
-      \ '<F12>': 'Step out',
-      \ }
+
+if has('python3')
+  let g:which_key_map_space.D = {
+        \ 'name': '+debug',
+        \ '<F3>': 'Stop',
+        \ '<F4>': 'Restart',
+        \ '<F5>': 'Start/Continue',
+        \ '<F6>': 'Pause',
+        \ '<F8>': 'Add function breakpoint',
+        \ '<leader><F8>': 'Run to cursor',
+        \ '<F9>': 'Toggle breakpoint',
+        \ '<leader><F9>': 'Toggle conditional breakpoint',
+        \ '<F10>': 'Step over',
+        \ '<F11>': 'Step into',
+        \ '<F12>': 'Step out',
+        \ }
+
+  let g:which_key_map_space.D.t = {
+        \ 'name': '+toggle',
+        \ 'b' : 'Breakpoint view',
+        \ 'c' : 'Console',
+        \ }
+endif
 
 let g:which_key_map_space.t = {
       \ 'name': '+toggle',
       \ 'm': 'markdown preview',
+      \ 'd': 'database ui',
       \ }
 
 if has('sound')
+  nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
   let g:which_key_map_space.t.k = 'keystroke sound'
 endif
 
@@ -1088,11 +1131,20 @@ nnoremap <silent> <space>df <cmd>FormatDisable<cr>
 
 nnoremap <silent> <space>tm <cmd>MarkdownPreviewToggle<cr>
 
-if has('sound')
-  nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
-endif
-
 " abbreviation
 iab jw Jerry Wang <jerrywang1981@outlook.com>
 iab jwi Jerry Wang <jianjunw@cn.ibm.com>
 iab jwc  .--- . .-. .-. -.--  .-- .- -. --.
+
+" java debug
+" mvn spring-boot:run -D"spring-boot.run.jvmArguments"="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y"
+" jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=5005
+"
+" vim-lsp-settings
+" java 21
+" install-eclipse-jdt-ls.cmd
+" curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.33.0/jdt-language-server-1.33.0-202402151717.tar.gz"
+"
+" java 17
+" curl -Lo jdt-language-server-latest.tar.gz "https://download.eclipse.org/jdtls/milestones/1.28.0/jdt-language-server-1.28.0-202309281329.tar.gz"
+"
