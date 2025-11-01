@@ -35,7 +35,10 @@ endif
 " linux
 " curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-if empty(glob(data_dir . '/autoload/plug.vim'))
+if g:env =~ 'WINDOWS' && empty(glob(data_dir . '/autoload/plug.vim'))
+  silent execute '!powershell -command  "iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni ' .. data_dir ..'/autoload/plug.vim -Force"'
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+elseif g:env =~ 'LINUX' && empty(glob(data_dir . '/autoload/plug.vim'))
   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
@@ -107,6 +110,7 @@ Plug 'voldikss/vim-floaterm'
 Plug 'mbbill/undotree', { 'on': 'UndotreeToggle' }
 " Snippets are separated from the engine. Add this if you want them:
 Plug 'sbdchd/neoformat'
+Plug 'jerrywang1981/bookmarks.vim'
 "Plug 'jerrywang1981/morse.vim'
 
 Plug 'justinmk/vim-sneak'
