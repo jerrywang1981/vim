@@ -53,7 +53,6 @@ try
   packadd! comment
   packadd! editorconfig
   packadd! matchit
-  packadd! netrw
   packadd! nohlsearch
   packadd! cfilter
 catch /.*/
@@ -216,7 +215,6 @@ set shiftwidth=2
 
 let g:loaded_vimballPlugin = 1
 let g:loaded_tutor_mode_plugin = 1
-let g:loaded_manpager_plugin = 1
 
 " let g:loaded_netrw       = 1
 " let g:loaded_netrwPlugin = 1
@@ -464,6 +462,8 @@ nmap <space>b0 <Plug>lightline#bufferline#go(10)
 
 " vim-highlightedyank
 let g:highlightedyank_highlight_duration = 500
+" hlyank
+let g:hlyank_duration = 500
 
 " editorconfig
 
@@ -475,9 +475,9 @@ autocmd FileType gitcommit,nerdtree let b:EditorConfig_disable = 1
 " the follow code was taken from above website
 let g:comment_table = {
       \ 'vue': {
-			\   'htmlTag': 's:<!--,m:    ,e:-->',
-			\   'vue_typescript': 's1:/*,mb:*,ex:*/,://',
-			\   'cssStyle': 's1:/*,mb:*,ex:*/,://',
+      \   'htmlTag': 's:<!--,m:    ,e:-->',
+      \   'vue_typescript': 's1:/*,mb:*,ex:*/,://',
+      \   'cssStyle': 's1:/*,mb:*,ex:*/,://',
       \   }
       \ }
 let g:commentstring_table = {
@@ -517,24 +517,26 @@ endfunction
 
 function! s:setup_comment()
   augroup CommentstringEnabled
-		" Clear previous autocommands first in all cases, in case the filetype
-		" changed from something in the table, to something NOT in the table.
-		autocmd! CursorMoved <buffer>
+    " Clear previous autocommands first in all cases, in case the filetype
+    " changed from something in the table, to something NOT in the table.
+    autocmd! CursorMoved <buffer>
     if !empty(&filetype) && has_key(g:commentstring_table, &filetype)
-			let b:original_commentstring=&l:commentstring
-			autocmd CursorMoved <buffer> call <SID>UpdateCommentString()
-		endif
+      let b:original_commentstring=&l:commentstring
+      autocmd CursorMoved <buffer> call <SID>UpdateCommentString()
+    endif
     if !empty(&filetype) && has_key(g:comment_table, &filetype)
-			let b:original_comments=&l:comments
-			autocmd CursorMoved <buffer> call <SID>UpdateComments()
-		endif
-	augroup END
+      let b:original_comments=&l:comments
+      autocmd CursorMoved <buffer> call <SID>UpdateComments()
+    endif
+  augroup END
 endfunction
 
 augroup CommentstringBootstrap
-	autocmd!
+  autocmd!
   autocmd FileType vue call s:setup_comment()
 augroup END
+
+autocmd FileType vue syntax sync fromstart
 
 function! s:create_editorconfig()
   let l:config = fnamemodify(expand($HOME . '/.editorconfig'), ':p')
@@ -650,7 +652,7 @@ let g:fzf_action = {
       \ 'ctrl-x': 'split',
       \ 'ctrl-v': 'vsplit'}
 
-let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all'
+let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all,ctrl-q:select-all+accept'
 
 if executable('fd')
   let $FZF_DEFAULT_COMMAND = 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
@@ -713,20 +715,36 @@ vnoremap <silent> <leader>fSl <cmd>FloatermSend<cr>
 function! s:check_big_file(uri, bufnr)
   if empty(a:uri) || empty(a:bufnr)
     return
+  endif
+
+  let l:bufnr = str2nr(a:bufnr)
+  let l:ft = getbufvar(l:bufnr, '&filetype', '')
+  if l:ft == 'bigfile'
+    return
+  endif
+  let l:bufname = bufname(l:bufnr)
+  if l:bufname != a:uri
+    return
+  endif
+  let l:bigfile = v:false
+  let l:size = getfsize(l:bufname)
+  if l:size <= 0
+    return
+  elseif l:size > 1.5 * 1024 * 1024
+    let l:bigfile = v:true
   else
-    let l:bufnr = str2nr(a:bufnr)
-    let l:ft = getbufvar(l:bufnr, '&filetype', '')
-    if l:ft == 'bigfile'
+    let l:bufinfo = getbufinfo(l:bufname)
+    if empty(l:bufinfo)
       return
     endif
-    let l:bufname = bufname(l:bufnr)
-    if l:bufname != a:uri
-      return
+    if l:bufinfo[0].linecount > 20000
+      let l:bigfile = v:true
     endif
-    let l:size = getfsize(l:bufname)
-    if l:size <= 0
-      return
-    elseif l:size > 1.5 * 1024 * 1024
+  endif
+
+  if l:bigfile
+    let l:answer = input("Do you want to enable bigfile for this buffer? (y/N):")
+    if l:answer == "y"
       execute "NoMatchParen"
       call setbufvar(l:bufnr, '&filetype', 'bigfile')
       call setbufvar(l:bufnr, '&syntax', l:ft)
@@ -734,20 +752,6 @@ function! s:check_big_file(uri, bufnr)
       call setbufvar(l:bufnr, '&conceallevel', 0)
       call setbufvar(l:bufnr, '&wrap', v:false)
       call setbufvar(l:bufnr, '&foldenable', v:false)
-    else
-      let l:bufinfo = getbufinfo(l:bufname)
-      if empty(l:bufinfo)
-        return
-      endif
-      if l:bufinfo[0].linecount > 20000
-        execute "NoMatchParen"
-        call setbufvar(l:bufnr, '&filetype', 'bigfile')
-        call setbufvar(l:bufnr, '&syntax', l:ft)
-        call setbufvar(l:bufnr, '&foldmethod', 'manual')
-        call setbufvar(l:bufnr, '&conceallevel', 0)
-        call setbufvar(l:bufnr, '&wrap', v:false)
-        call setbufvar(l:bufnr, '&foldenable', v:false)
-      endif
     endif
   endif
 endfunction
@@ -907,13 +911,62 @@ function! s:qf_delete(line1, line2)
   endif
 endfunction
 
+function! s:FzfQuickfixFilter_S(line)
+  let parts = matchlist(a:line, '\(.\{-}\)\s*:\s*\(\d\+\)\%(\s*:\s*\(\d\+\)\)\?\%(\s*:\(.*\)\)\?')
+  let file = &acd ? fnamemodify(parts[1], ':p') : parts[1]
+  if has('win32unix') && file !~ '/'
+    let file = substitute(file, '\', '/', 'g')
+  endif
+  let dict = {'filename': file, 'lnum': parts[2], 'text': parts[4]}
+  if len(parts[3])
+    let dict.col = parts[3]
+  endif
+
+  try
+    execute "edit " .. dict.filename
+    execute dict.lnum
+    execute dict.lnum
+    if has_key(dict, 'col')
+      call cursor(0, dict.col)
+    endif
+    normal! zvzz
+  catch
+  endtry
+endfunction
+
+function! <SID>FzfQuickfixFilter()
+  if !exists("*fzf#run") || !exists("*fzf#wrap")
+    return
+  endif
+
+  let l:qf_list = copy(getqflist())
+  if len(l:qf_list) == 0
+    return
+  endif
+  let l:qf_list = map(l:qf_list, { _, val ->
+        \ bufname(val["bufnr"]) .. ":" .. val["lnum"] .. ":" ..
+        \ val["col"] .. ":" .. val["text"]
+        \ })
+
+  call fzf#run(fzf#wrap({
+        \ 'source': l:qf_list,
+        \ 'sink': function("s:FzfQuickfixFilter_S"),
+        \ 'options': ['--ansi']
+        \ }))
+endfunction
+
 function! s:on_qf_open() abort
   command! -buffer -range -nargs=0 QfDelete call s:qf_delete(<line1>, <line2>)
+  command! -nargs=0 Qfilter call <SID>FzfQuickfixFilter()
   nmap <buffer> dd <cmd>QfDelete<cr>
   map <buffer> gq <cmd>cclose<cr>
 endfunction
 
-autocmd FileType qf call s:on_qf_open()
+augroup QuickfixAuGroup
+  autocmd!
+  autocmd FileType qf call s:on_qf_open()
+augroup END
+
 
 " LSP config
 " let g:lsp_diagnostics_enabled = 0         " disable diagnostics support
@@ -921,8 +974,8 @@ let g:lsp_fold_enabled = 0
 let g:lsp_format_sync_timeout = 1000
 " let g:lsp_inlay_hints_enabled = 1
 let g:lsp_inlay_hints_mode = {
-  \  'normal': ['curline'],
-  \}
+      \  'normal': ['curline'],
+      \}
 
 let g:lsp_document_code_action_signs_hint = {'text': '🚀'}
 let g:lsp_diagnostics_signs_error = {'text': '🚨'}
