@@ -425,7 +425,13 @@ endfunction
 
 command! -nargs=? SessionSave call <SID>SaveSession(<f-args>)
 command! -nargs=? SessionLoad execute 'SLoad ' . GetUniqueSessionName()
-command! -bang -nargs=0 Sessions call fzf#vim#files(startify#get_session_path(), {'sink*': function('s:SessionLoadFunction')}, <bang>0)
+command! -bang -nargs=0 Sessions call fzf#vim#files(
+      \ startify#get_session_path(),
+      \ {
+      \   'sink*': function('s:SessionLoadFunction'),
+      \   'options': ['--prompt', 'Sessions>']
+      \ },
+      \ <bang>0)
 
 " vim-http
 " let g:vim_http_split_vertically = 1
@@ -633,12 +639,14 @@ let g:rooter_patterns = ['.git']
 " fzf
 nnoremap <silent> <C-p> <cmd>GFiles<CR>
 nnoremap <silent> <leader>ff <cmd>Files<CR>
-nnoremap <silent> <leader>fS <cmd>Sessions<CR>
+nnoremap <silent> <leader>fgS <cmd>Sessions<CR>
+nnoremap <silent> <leader>fgB <cmd>BookmarksFzf<CR>
 nnoremap <silent> <leader>fb <cmd>Buffers<CR>
 nnoremap <silent> <leader>fh <cmd>History<CR>
 nnoremap <silent> <leader>fgg <cmd>RG<CR>
 nnoremap <silent> <leader>fgh <cmd>RgAll<CR>
 nnoremap <silent> <leader>fg/ <cmd>BLines<CR>
+nnoremap <silent> <leader>fq :<c-u>call <SID>FzfQuickfixFilter()<CR>
 "nnoremap <silent> <leader>fgw :<c-u>RG <c-r><c-w><CR>
 
 function! s:build_quickfix_list(lines)
@@ -911,27 +919,9 @@ function! s:qf_delete(line1, line2)
   endif
 endfunction
 
-function! s:FzfQuickfixFilter_S(line)
-  let parts = matchlist(a:line, '\(.\{-}\)\s*:\s*\(\d\+\)\%(\s*:\s*\(\d\+\)\)\?\%(\s*:\(.*\)\)\?')
-  let file = &acd ? fnamemodify(parts[1], ':p') : parts[1]
-  if has('win32unix') && file !~ '/'
-    let file = substitute(file, '\', '/', 'g')
-  endif
-  let dict = {'filename': file, 'lnum': parts[2], 'text': parts[4]}
-  if len(parts[3])
-    let dict.col = parts[3]
-  endif
-
-  try
-    execute "edit " .. dict.filename
-    execute dict.lnum
-    execute dict.lnum
-    if has_key(dict, 'col')
-      call cursor(0, dict.col)
-    endif
-    normal! zvzz
-  catch
-  endtry
+function s:Qf_Lambda_filter(k, val)
+  return  bufname(a:val["bufnr"]) .. ":" .. a:val["lnum"] .. ":" ..
+        \ a:val["col"] .. ":" .. a:val["text"]
 endfunction
 
 function! <SID>FzfQuickfixFilter()
@@ -943,21 +933,47 @@ function! <SID>FzfQuickfixFilter()
   if len(l:qf_list) == 0
     return
   endif
-  let l:qf_list = map(l:qf_list, { _, val ->
-        \ bufname(val["bufnr"]) .. ":" .. val["lnum"] .. ":" ..
-        \ val["col"] .. ":" .. val["text"]
-        \ })
+
+  let l:qf_list_source = mapnew(l:qf_list, function('s:Qf_Lambda_filter'))
+
+  function! s:FzfQuickfixFilter_S(lines) closure
+    if len(a:lines) == 0
+      return
+    endif
+    call filter(l:qf_list, { _, val ->
+          \ index(a:lines, s:Qf_Lambda_filter(1, val)) >= 0
+          \ })
+    if len(l:qf_list) < 1
+      return
+    endif
+    call setqflist(l:qf_list)
+
+    try
+      let l:first = l:qf_list[0]
+      execute "buffer " .. l:first["bufnr"]
+      execute l:first["lnum"]
+      if has_key(l:first, 'col')
+        call cursor(0, l:first["col"])
+      endif
+      normal! zvzz
+    catch
+    endtry
+  endfunction
 
   call fzf#run(fzf#wrap({
-        \ 'source': l:qf_list,
-        \ 'sink': function("s:FzfQuickfixFilter_S"),
-        \ 'options': ['--ansi']
+        \ 'source': l:qf_list_source,
+        \ 'sink*': function("s:FzfQuickfixFilter_S"),
+        \ 'options': ['--ansi', '--multi',
+        \ '--prompt', 'Quickfix>',
+        \ '--bind', 'ctrl-a:select-all']
         \ }))
+
 endfunction
+
+" command! -nargs=0 Qfilter call <SID>FzfQuickfixFilter()
 
 function! s:on_qf_open() abort
   command! -buffer -range -nargs=0 QfDelete call s:qf_delete(<line1>, <line2>)
-  command! -nargs=0 Qfilter call <SID>FzfQuickfixFilter()
   nmap <buffer> dd <cmd>QfDelete<cr>
   map <buffer> gq <cmd>cclose<cr>
 endfunction
@@ -1102,12 +1118,17 @@ let g:which_key_map_leader.e = {
 
 let g:which_key_map_leader.f = {
       \'name': '+fzf/floaterm',
+      \'b': 'Buffers',
       \'f': 'Find files',
+      \'h': 'Histories',
+      \'q': 'Quickfix',
       \'g': {
       \   'name': '+grep',
       \   'g': 'Git files',
       \   'h': 'all files',
       \   '/': 'Buffer lines',
+      \   'S': 'Sessions',
+      \   'B': 'Browser Bookmarks',
       \  }
       \}
 
