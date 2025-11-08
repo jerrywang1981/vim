@@ -366,30 +366,32 @@ let g:startify_lists = [
       \ { 'type' : 'files', 'header' : [ "   MRU" ] }
       \ ]
 
-let g:startify_custom_header =
-      \ startify#center([
-      \ '       _                       __          __                  ',
-      \ '      | |                      \ \        / /                  ',
-      \ '      | | ___ _ __ _ __ _   _   \ \  /\  / /_ _ _ __   __ _    ',
-      \ '  _   | |/ _ \ |__| |__| | | |   \ \/  \/ / _| | |_ \ / _` |   ',
-      \ ' | |__| |  __/ |  | |  | |_| |    \  /\  / (_| | | | | (_| |   ',
-      \ '  \____/ \___|_|  |_|   \__| |     \/  \/ \__|_|_| |_|\__| |   ',
-      \ '                         __/ |                         __/ | * @jerrywang1981 github  ',
-      \ '                        |___/                         |___/  * https://jerrywang1981.github.io  ',
-      \ '                                                             * jerrywang1981@outlook.com ',
-      \ '                                                               ',
-      \ '                                                               ',
-      \ '           .--- . .-. .-. -.--  .-- .- -. --.                  ',
-      \ ])
+try
+  let g:startify_custom_header =
+        \ startify#center([
+        \ '       _                       __          __                  ',
+        \ '      | |                      \ \        / /                  ',
+        \ '      | | ___ _ __ _ __ _   _   \ \  /\  / /_ _ _ __   __ _    ',
+        \ '  _   | |/ _ \ |__| |__| | | |   \ \/  \/ / _| | |_ \ / _` |   ',
+        \ ' | |__| |  __/ |  | |  | |_| |    \  /\  / (_| | | | | (_| |   ',
+        \ '  \____/ \___|_|  |_|   \__| |     \/  \/ \__|_|_| |_|\__| |   ',
+        \ '                         __/ |                         __/ | * @jerrywang1981 github  ',
+        \ '                        |___/                         |___/  * https://jerrywang1981.github.io  ',
+        \ '                                                             * jerrywang1981@outlook.com ',
+        \ '                                                               ',
+        \ '                                                               ',
+        \ '           .--- . .-. .-. -.--  .-- .- -. --.                  ',
+        \ ])
 
-
-let g:startify_custom_footer = startify#center([
-      \ '春风杨柳万千条, 六亿神州尽舜尧',
-      \ '红雨随心翻作浪, 青山着意化为桥',
-      \ '天连五岭银锄落, 地动三河铁臂摇',
-      \ '借问瘟君欲何往, 纸船明烛照天烧',
-      \ '                               七律二首 送瘟神',
-      \ ])
+  let g:startify_custom_footer = startify#center([
+        \ '春风杨柳万千条, 六亿神州尽舜尧',
+        \ '红雨随心翻作浪, 青山着意化为桥',
+        \ '天连五岭银锄落, 地动三河铁臂摇',
+        \ '借问瘟君欲何往, 纸船明烛照天烧',
+        \ '                               七律二首 送瘟神',
+        \ ])
+catch
+endtry
 
 function! GetUniqueSessionName()
   let path = fnamemodify(getcwd(), ':p:~')
@@ -1001,8 +1003,8 @@ let g:lsp_diagnostics_signs_information = {'text': 'ℹ️'}
 let g:lsp_diagnostics_virtual_text_enabled = 1
 let g:lsp_diagnostics_virtual_text_align = "right"
 
-let g:lsp_log_verbose = 1
-let g:lsp_log_file = expand('~/vim-lsp.log')
+" let g:lsp_log_verbose = 1
+" let g:lsp_log_file = expand('~/vim-lsp.log')
 
 function! s:on_lsp_buffer_enabled() abort
   setlocal omnifunc=lsp#complete
