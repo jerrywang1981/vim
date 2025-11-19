@@ -315,7 +315,16 @@ map <silent> <space>1 :NERDTreeToggle<cr>
 
 
 " vim-fugitive
-autocmd BufReadPost fugitive://* set bufhidden=delete
+
+augroup FugitiveGroup
+  au!
+  autocmd BufReadPost fugitive://* set bufhidden=delete
+augroup END
+
+augroup ColorColumn
+  au!
+  autocmd FileType fugitive,help,nerdtree,startify set colorcolumn=
+augroup END
 
 " database
 let g:db_ui_use_nerd_fonts = 1
@@ -635,7 +644,7 @@ let g:sneak#map_netrw = 0
 let g:sneak#use_ic_scs = 1
 
 " vim-rooter
-let g:rooter_silent_chdir = 0
+let g:rooter_silent_chdir = 1
 let g:rooter_patterns = ['.git']
 
 " fzf
@@ -802,6 +811,7 @@ let g:lsp_settings = {
       \  },
       \ 'eclipse-jdt-ls': {
       \   'initialization_options': {
+      \     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
       \     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1)
       \     },
       \     'root_uri_patterns': ['.git']
@@ -1217,6 +1227,10 @@ iab jwi Jerry Wang <jianjunw@cn.ibm.com>
 iab jwc  .--- . .-. .-. -.--  .-- .- -. --.
 
 " java debug
+" java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1808 Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=xx.xx.xxx.xx -Dcom.sun.management.jmxremote.rmi.port=1808 -jar app.jar
+"
+" java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 -jar app.jar
+"
 " mvn spring-boot:run -D"spring-boot.run.jvmArguments"="-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=5005,suspend=y"
 " jdb -connect com.sun.jdi.SocketAttach:hostname=127.0.0.1,port=5005
 "
