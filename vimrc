@@ -137,9 +137,9 @@ if has('python3')
   Plug 'puremourning/vimspector'
 endif
 
-if has('sound')
-  Plug 'jerrywang1981/vim-keystroke'
-endif
+" if has('sound')
+"   Plug 'jerrywang1981/vim-keystroke'
+" endif
 
 Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 
@@ -163,7 +163,9 @@ call plug#end()
 " runtime! plugin/sensible.vim
 
 set path+=**
-set clipboard+=unnamed      " use the clipboards of vim and win
+" set clipboard+=unnamed      " use the clipboards of vim and win
+" set clipboard+=unnamedplus      " use the clipboards of vim and win
+set clipboard=unnamedplus
 set guioptions+=a               " Visual selection automatically copied to the clipboard
 set guioptions-=T  "remove toolbar
 set guioptions-=r  "remove scrollbar
@@ -791,10 +793,11 @@ nnoremap <silent> <space>7 <cmd>UndotreeToggle<cr>
 
 " vim-keystroke
 "valid theme: 'default', 'bubble', 'mario', 'sword', 'typewriter'
-if has('sound')
-  let g:keystroke_theme = 'typewriter'
-  autocmd VimEnter * KeyStrokeEnable
-endif
+" if has('sound')
+"   let g:keystroke_theme = 'typewriter'
+"   " let g:keystroke_vim_sound = 0
+"   autocmd VimEnter * KeyStrokeEnable
+" endif
 
 "autopairs
 let g:AutoPairsFlyMode = 0
@@ -1183,10 +1186,10 @@ let g:which_key_map_space.t = {
       \ 'd': 'database ui',
       \ }
 
-if has('sound')
-  nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
-  let g:which_key_map_space.t.k = 'keystroke sound'
-endif
+" if has('sound')
+"   nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
+"   let g:which_key_map_space.t.k = 'keystroke sound'
+" endif
 
 let g:which_key_map_space.b = {
       \'name': '+buffers',
