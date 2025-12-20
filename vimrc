@@ -163,9 +163,9 @@ call plug#end()
 " runtime! plugin/sensible.vim
 
 set path+=**
-" set clipboard+=unnamed      " use the clipboards of vim and win
+set clipboard+=unnamed      " use the clipboards of vim and win
 " set clipboard+=unnamedplus      " use the clipboards of vim and win
-set clipboard=unnamedplus
+" set clipboard=unnamedplus
 set guioptions+=a               " Visual selection automatically copied to the clipboard
 set guioptions-=T  "remove toolbar
 set guioptions-=r  "remove scrollbar
@@ -323,10 +323,10 @@ augroup FugitiveGroup
   autocmd BufReadPost fugitive://* set bufhidden=delete
 augroup END
 
-augroup ColorColumn
-  au!
-  autocmd FileType fugitive,help,nerdtree,startify set colorcolumn=
-augroup END
+" augroup ColorColumn
+"   au!
+"   autocmd FileType fugitive,help,nerdtree,startify set colorcolumn=
+" augroup END
 
 " database
 let g:db_ui_use_nerd_fonts = 1
@@ -487,7 +487,7 @@ let g:hlyank_duration = 500
 " editorconfig
 
 let g:EditorConfig_exclude_patterns = ['fugitive://.*', 'scp://.*']
-autocmd FileType gitcommit,nerdtree let b:EditorConfig_disable = 1
+autocmd FileType gitcommit,nerdtree,startify,help let b:EditorConfig_disable = 1
 
 
 " https://github.com/suy/vim-context-commentstring
