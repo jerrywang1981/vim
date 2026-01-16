@@ -17,17 +17,17 @@ let g:mapleader = ","
 let g:maplocalleader = ","
 
 if !exists('g:env')
-  if has('win64') || has('win32') || has('win16')
-    let g:env = 'WINDOWS'
-  else
-    let g:env = toupper(substitute(system('uname'), '\n', '', ''))
-  endif
+	if has('win64') || has('win32') || has('win16')
+		let g:env = 'WINDOWS'
+	else
+		let g:env = toupper(substitute(system('uname'), '\n', '', ''))
+	endif
 endif
 
 if g:env =~ 'WINDOWS'
-  let data_dir = $HOME . '/vimfiles'
+	let data_dir = $HOME . '/vimfiles'
 elseif g:env =~ 'LINUX'
-  let data_dir = $HOME . '/.vim'
+	let data_dir = $HOME . '/.vim'
 endif
 
 " windows (powershell)
@@ -36,11 +36,11 @@ endif
 " curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 if g:env =~ 'WINDOWS' && empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!powershell -command  "iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni ' .. data_dir ..'/autoload/plug.vim -Force"'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+	silent execute '!powershell -command  "iwr -useb https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim | ni ' .. data_dir ..'/autoload/plug.vim -Force"'
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 elseif g:env =~ 'LINUX' && empty(glob(data_dir . '/autoload/plug.vim'))
-  silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+	silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 " vim-plug
@@ -49,12 +49,12 @@ let g:plug_threads = 4
 let g:plug_shallow = 1
 
 try
-  packadd! hlyank
-  packadd! comment
-  packadd! editorconfig
-  packadd! matchit
-  packadd! nohlsearch
-  packadd! cfilter
+	packadd! hlyank
+	packadd! comment
+	packadd! editorconfig
+	packadd! matchit
+	packadd! nohlsearch
+	packadd! cfilter
 catch /.*/
 endtry
 
@@ -134,7 +134,7 @@ Plug 'hrsh7th/vim-vsnip-integ'
 " Plug 'dense-analysis/ale'
 
 if has('python3')
-  Plug 'puremourning/vimspector'
+	Plug 'puremourning/vimspector'
 endif
 
 " if has('sound')
@@ -237,27 +237,27 @@ let &t_SR = "\<Esc>[4 q"
 let &t_EI = "\<Esc>[2 q"
 
 if exists('+termguicolors')
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+	let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+	let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 endif
 
 if has("persistent_undo")
-  let target_path = expand('~/.undo_dir')
-  " create the directory and any parent directories
-  " if the location does not exist.
-  if !isdirectory(target_path)
-    call mkdir(target_path, "p", 0700)
-  endif
+	let target_path = expand('~/.undo_dir')
+	" create the directory and any parent directories
+	" if the location does not exist.
+	if !isdirectory(target_path)
+		call mkdir(target_path, "p", 0700)
+	endif
 
-  let &undodir=target_path
-  set undofile
+	let &undodir=target_path
+	set undofile
 endif
 
 if has("wildignore") == 1 && has("popupwin") == 1
-  try
-    set wildoptions=pum
-  catch /.*/
-  endtry
+	try
+		set wildoptions=pum
+	catch /.*/
+	endtry
 endif
 
 set background=dark
@@ -319,8 +319,8 @@ map <silent> <space>1 :NERDTreeToggle<cr>
 " vim-fugitive
 
 augroup FugitiveGroup
-  au!
-  autocmd BufReadPost fugitive://* set bufhidden=delete
+	au!
+	autocmd BufReadPost fugitive://* set bufhidden=delete
 augroup END
 
 " augroup ColorColumn
@@ -335,37 +335,37 @@ nnoremap <silent> <space>td <cmd>DBUIToggle<cr>
 
 " git status from gitgutter
 function! GitStatus()
-  let l:ft = ['fugitive', 'startify', 'help']
-  if index(l:ft, &ft) >= 0 | return "" | endif
-  let [a,m,r] = GitGutterGetHunkSummary()
-  return printf('+%d ~%d -%d', a, m, r)
+	let l:ft = ['fugitive', 'startify', 'help']
+	if index(l:ft, &ft) >= 0 | return "" | endif
+	let [a,m,r] = GitGutterGetHunkSummary()
+	return printf('+%d ~%d -%d', a, m, r)
 endfunction
 
 " lightline
 let g:lightline = {
-      \ 'colorscheme': 'wombat',
-      \ 'active': {
-      \   'left': [ [ 'mode', 'paste' ],
-      \             [ 'gitbranch', 'readonly', 'modified', 'gitstatus', 'jerry', 'filename' ] ]
-      \ },
-      \ 'tabline': {
-      \   'left': [ ['buffers']  ],
-      \   'right': [ ['close']  ]
-      \ },
-      \ 'component': {
-      \   'jerry': ' Jerry Wang'
-      \ },
-      \ 'component_function': {
-      \   'gitbranch': 'gitbranch#name',
-      \   'gitstatus': 'GitStatus'
-      \ },
-      \ 'component_expand': {
-      \   'buffers': 'lightline#bufferline#buffers'
-      \ },
-      \ 'component_type': {
-      \   'buffers': 'tabsel'
-      \ }
-      \ }
+			\ 'colorscheme': 'wombat',
+			\ 'active': {
+			\   'left': [ [ 'mode', 'paste' ],
+			\             [ 'gitbranch', 'readonly', 'modified', 'gitstatus', 'jerry', 'filename' ] ]
+			\ },
+			\ 'tabline': {
+			\   'left': [ ['buffers']  ],
+			\   'right': [ ['close']  ]
+			\ },
+			\ 'component': {
+			\   'jerry': ' Jerry Wang'
+			\ },
+			\ 'component_function': {
+			\   'gitbranch': 'gitbranch#name',
+			\   'gitstatus': 'GitStatus'
+			\ },
+			\ 'component_expand': {
+			\   'buffers': 'lightline#bufferline#buffers'
+			\ },
+			\ 'component_type': {
+			\   'buffers': 'tabsel'
+			\ }
+			\ }
 
 " vim-startify
 
@@ -374,77 +374,77 @@ let g:startify_change_to_dir=0
 let g:startify_files_number=5
 let g:startify_enable_special=0
 let g:startify_lists = [
-      \ { 'type' : 'files', 'header' : [ "   MRU" ] }
-      \ ]
+			\ { 'type' : 'files', 'header' : [ "   MRU" ] }
+			\ ]
 
 try
-  let g:startify_custom_header =
-        \ startify#center([
-        \ '       _                       __          __                  ',
-        \ '      | |                      \ \        / /                  ',
-        \ '      | | ___ _ __ _ __ _   _   \ \  /\  / /_ _ _ __   __ _    ',
-        \ '  _   | |/ _ \ |__| |__| | | |   \ \/  \/ / _| | |_ \ / _` |   ',
-        \ ' | |__| |  __/ |  | |  | |_| |    \  /\  / (_| | | | | (_| |   ',
-        \ '  \____/ \___|_|  |_|   \__| |     \/  \/ \__|_|_| |_|\__| |   ',
-        \ '                         __/ |                         __/ | * @jerrywang1981 github  ',
-        \ '                        |___/                         |___/  * https://jerrywang1981.github.io  ',
-        \ '                                                             * jerrywang1981@outlook.com ',
-        \ '                                                               ',
-        \ '                                                               ',
-        \ '           .--- . .-. .-. -.--  .-- .- -. --.                  ',
-        \ ])
+	let g:startify_custom_header =
+				\ startify#center([
+				\ '       _                       __          __                  ',
+				\ '      | |                      \ \        / /                  ',
+				\ '      | | ___ _ __ _ __ _   _   \ \  /\  / /_ _ _ __   __ _    ',
+				\ '  _   | |/ _ \ |__| |__| | | |   \ \/  \/ / _| | |_ \ / _` |   ',
+				\ ' | |__| |  __/ |  | |  | |_| |    \  /\  / (_| | | | | (_| |   ',
+				\ '  \____/ \___|_|  |_|   \__| |     \/  \/ \__|_|_| |_|\__| |   ',
+				\ '                         __/ |                         __/ | * @jerrywang1981 github  ',
+				\ '                        |___/                         |___/  * https://jerrywang1981.github.io  ',
+				\ '                                                             * jerrywang1981@outlook.com ',
+				\ '                                                               ',
+				\ '                                                               ',
+				\ '           .--- . .-. .-. -.--  .-- .- -. --.                  ',
+				\ ])
 
-  let g:startify_custom_footer = startify#center([
-        \ '春风杨柳万千条, 六亿神州尽舜尧',
-        \ '红雨随心翻作浪, 青山着意化为桥',
-        \ '天连五岭银锄落, 地动三河铁臂摇',
-        \ '借问瘟君欲何往, 纸船明烛照天烧',
-        \ '                               七律二首 送瘟神',
-        \ ])
+	let g:startify_custom_footer = startify#center([
+				\ '春风杨柳万千条, 六亿神州尽舜尧',
+				\ '红雨随心翻作浪, 青山着意化为桥',
+				\ '天连五岭银锄落, 地动三河铁臂摇',
+				\ '借问瘟君欲何往, 纸船明烛照天烧',
+				\ '                               七律二首 送瘟神',
+				\ ])
 catch
 endtry
 
 function! GetUniqueSessionName()
-  let path = fnamemodify(getcwd(), ':p:~')
-  let path = empty(path) ? 'no-project' : path
-  let branch = gitbranch#name()
-  let branch = empty(branch) ? '' :  branch
-  return substitute(substitute(substitute(substitute(path . branch, '^\~\', '', 'g'), '^\~/', '', 'g'), '/', '-', 'g'), '\', '-', 'g') . '.vim'
+	let path = fnamemodify(getcwd(), ':p:~')
+	let path = empty(path) ? 'no-project' : path
+	let branch = gitbranch#name()
+	let branch = empty(branch) ? '' :  branch
+	return substitute(substitute(substitute(substitute(path . branch, '^\~\', '', 'g'), '^\~/', '', 'g'), '/', '-', 'g'), '\', '-', 'g') . '.vim'
 endfunction
 
 " autocmd User        StartifyReady silent execute 'SLoad '  . GetUniqueSessionName()
 " autocmd VimLeavePre *             execute 'SSave! ' . GetUniqueSessionName()
 
 function! s:SessionLoadFunction(files)
-  if len(a:files) < 2
-    return
-  endif
+	if len(a:files) < 2
+		return
+	endif
 
-  let l:file = get(a:files, 1)
-  if l:file == ''
-    echom 'wrong'
-  endif
+	let l:file = get(a:files, 1)
+	if l:file == ''
+		echom 'wrong'
+	endif
 
-  silent execute 'SLoad '  . l:file
+	silent execute 'SLoad '  . l:file
 endfunction
 
 function! <SID>SaveSession(...)
-  if a:0 == 0
-    execute 'SSave! ' . GetUniqueSessionName()
-  else
-    execute 'SSave! ' . a:1
-  endif
+	if a:0 == 0
+		execute 'SSave! ' . GetUniqueSessionName()
+	else
+		execute 'SSave! ' . a:1
+	endif
 endfunction
 
 command! -nargs=? SessionSave call <SID>SaveSession(<f-args>)
 command! -nargs=? SessionLoad execute 'SLoad ' . GetUniqueSessionName()
 command! -bang -nargs=0 Sessions call fzf#vim#files(
-      \ startify#get_session_path(),
-      \ {
-      \   'sink*': function('s:SessionLoadFunction'),
-      \   'options': ['--prompt', 'Sessions>']
-      \ },
-      \ <bang>0)
+			\ startify#get_session_path(),
+			\ {
+			\   'sink*': function('s:SessionLoadFunction'),
+			\   'options': ['--prompt', 'Sessions>']
+			\ },
+			\ <bang>0)
 
 " vim-http
 " let g:vim_http_split_vertically = 1
@@ -454,16 +454,16 @@ command! -bang -nargs=0 Sessions call fzf#vim#files(
 " lightline-bufferline
 let g:lightline#bufferline#show_number = 3
 let g:lightline#bufferline#ordinal_number_map = {
-      \ 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄',
-      \ 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' }
+			\ 0: '₀', 1: '₁', 2: '₂', 3: '₃', 4: '₄',
+			\ 5: '₅', 6: '₆', 7: '₇', 8: '₈', 9: '₉' }
 let g:lightline#bufferline#enable_devicons = 1
 " let g:lightline#bufferline#shorten_path = 1
 
 function <SID>GoToBuffer()
-  let l:buf = str2nr(input("Which buffer:"))
-  if l:buf > 0
-    call lightline#bufferline#go(l:buf)
-  endif
+	let l:buf = str2nr(input("Which buffer:"))
+	if l:buf > 0
+		call lightline#bufferline#go(l:buf)
+	endif
 endfunction
 
 nmap <space>bb :<c-u>call <SID>GoToBuffer()<cr>
@@ -493,142 +493,142 @@ autocmd FileType gitcommit,nerdtree,startify,help let b:EditorConfig_disable = 1
 " https://github.com/suy/vim-context-commentstring
 " the follow code was taken from above website
 let g:comment_table = {
-      \ 'vue': {
-      \   'htmlTag': 's:<!--,m:    ,e:-->',
-      \   'vue_typescript': 's1:/*,mb:*,ex:*/,://',
-      \   'cssStyle': 's1:/*,mb:*,ex:*/,://',
-      \   }
-      \ }
+			\ 'vue': {
+			\   'htmlTag': 's:<!--,m:    ,e:-->',
+			\   'vue_typescript': 's1:/*,mb:*,ex:*/,://',
+			\   'cssStyle': 's1:/*,mb:*,ex:*/,://',
+			\   }
+			\ }
 let g:commentstring_table = {
-      \ 'vue': {
-      \   'javaScript'  : '//%s',
-      \   'cssStyle'    : '/*%s*/',
-      \   'vue_scss'    : '/*%s*/',
-      \   }
-      \ }
+			\ 'vue': {
+			\   'javaScript'  : '//%s',
+			\   'cssStyle'    : '/*%s*/',
+			\   'vue_scss'    : '/*%s*/',
+			\   }
+			\ }
 
 function! <SID>UpdateComments()
-  let stack = synstack(line('.'), col('.'))
-  call reverse(stack)
-  if !empty(stack)
-    for name in map(stack, 'synIDattr(v:val, "name")')
-      if has_key(g:comment_table[&filetype], name)
-        let &l:comments = g:comment_table[&filetype][name]
-        return
-      endif
-    endfor
-  endif
-  let &l:comments = b:original_comments
+	let stack = synstack(line('.'), col('.'))
+	call reverse(stack)
+	if !empty(stack)
+		for name in map(stack, 'synIDattr(v:val, "name")')
+			if has_key(g:comment_table[&filetype], name)
+				let &l:comments = g:comment_table[&filetype][name]
+				return
+			endif
+		endfor
+	endif
+	let &l:comments = b:original_comments
 endfunction
 
 function! <SID>UpdateCommentString()
-  let stack = synstack(line('.'), col('.'))
-  if !empty(stack)
-    for name in map(stack, 'synIDattr(v:val, "name")')
-      if has_key(g:commentstring_table[&filetype], name)
-        let &l:commentstring = g:commentstring_table[&filetype][name]
-        return
-      endif
-    endfor
-  endif
-  let &l:commentstring = b:original_commentstring
+	let stack = synstack(line('.'), col('.'))
+	if !empty(stack)
+		for name in map(stack, 'synIDattr(v:val, "name")')
+			if has_key(g:commentstring_table[&filetype], name)
+				let &l:commentstring = g:commentstring_table[&filetype][name]
+				return
+			endif
+		endfor
+	endif
+	let &l:commentstring = b:original_commentstring
 endfunction
 
 function! s:setup_comment()
-  augroup CommentstringEnabled
-    " Clear previous autocommands first in all cases, in case the filetype
-    " changed from something in the table, to something NOT in the table.
-    autocmd! CursorMoved <buffer>
-    if !empty(&filetype) && has_key(g:commentstring_table, &filetype)
-      let b:original_commentstring=&l:commentstring
-      autocmd CursorMoved <buffer> call <SID>UpdateCommentString()
-    endif
-    if !empty(&filetype) && has_key(g:comment_table, &filetype)
-      let b:original_comments=&l:comments
-      autocmd CursorMoved <buffer> call <SID>UpdateComments()
-    endif
-  augroup END
+	augroup CommentstringEnabled
+		" Clear previous autocommands first in all cases, in case the filetype
+		" changed from something in the table, to something NOT in the table.
+		autocmd! CursorMoved <buffer>
+		if !empty(&filetype) && has_key(g:commentstring_table, &filetype)
+			let b:original_commentstring=&l:commentstring
+			autocmd CursorMoved <buffer> call <SID>UpdateCommentString()
+		endif
+		if !empty(&filetype) && has_key(g:comment_table, &filetype)
+			let b:original_comments=&l:comments
+			autocmd CursorMoved <buffer> call <SID>UpdateComments()
+		endif
+	augroup END
 endfunction
 
 augroup CommentstringBootstrap
-  autocmd!
-  autocmd FileType vue call s:setup_comment()
+	autocmd!
+	autocmd FileType vue call s:setup_comment()
 augroup END
 
 autocmd FileType vue syntax sync fromstart
 
 function! s:create_editorconfig()
-  let l:config = fnamemodify(expand($HOME . '/.editorconfig'), ':p')
-  if filereadable(l:config)
-    echom "The file " . l:config . " exists."
-    return
-  endif
-  let l:text = [
-        \ "# EditorConfig is awesome: https://EditorConfig.org",
-        \ "",
-        \ "# top-most EditorConfig file",
-        \ "root = true",
-        \ "",
-        \ "# Unix-style newlines with a newline ending every file",
-        \ "[*]",
-        \ "charset = utf-8",
-        \ "indent_style = space",
-        \ "end_of_line = lf",
-        \ "indent_size = 2",
-        \ "insert_final_newline = true",
-        \ "trim_trailing_whitespace = true",
-        \ "",
-        \ "",
-        \ "# 4 space indentation",
-        \ "[*.py]",
-        \ "indent_size = 4",
-        \ "",
-        \ "[*.java]",
-        \ "indent_size = 2",
-        \ "",
-        \ "[*.rs]",
-        \ "indent_size = 4",
-        \ "",
-        \ "# Tab indentation (no size specified)",
-        \ "[Makefile]",
-        \ "indent_style = tab",
-        \ "",
-        \ "# Indentation override for all JS under lib directory",
-        \ "[lib/**.js]",
-        \ "indent_style = space",
-        \ "indent_size = 2",
-        \ "",
-        \ "# Matches the exact files either package.json or .travis.yml",
-        \ "[{package.json,.travis.yml}]",
-        \ "indent_style = space",
-        \ "indent_size = 2",
-        \ ]
-  call writefile(l:text, l:config)
-  echom "The file " . l:config . " was created"
+	let l:config = fnamemodify(expand($HOME . '/.editorconfig'), ':p')
+	if filereadable(l:config)
+		echom "The file " . l:config . " exists."
+		return
+	endif
+	let l:text = [
+				\ "# EditorConfig is awesome: https://EditorConfig.org",
+				\ "",
+				\ "# top-most EditorConfig file",
+				\ "root = true",
+				\ "",
+				\ "# Unix-style newlines with a newline ending every file",
+				\ "[*]",
+				\ "charset = utf-8",
+				\ "indent_style = space",
+				\ "end_of_line = lf",
+				\ "indent_size = 2",
+				\ "insert_final_newline = true",
+				\ "trim_trailing_whitespace = true",
+				\ "",
+				\ "",
+				\ "# 4 space indentation",
+				\ "[*.py]",
+				\ "indent_size = 4",
+				\ "",
+				\ "[*.java]",
+				\ "indent_size = 2",
+				\ "",
+				\ "[*.rs]",
+				\ "indent_size = 4",
+				\ "",
+				\ "# Tab indentation (no size specified)",
+				\ "[Makefile]",
+				\ "indent_style = tab",
+				\ "",
+				\ "# Indentation override for all JS under lib directory",
+				\ "[lib/**.js]",
+				\ "indent_style = space",
+				\ "indent_size = 2",
+				\ "",
+				\ "# Matches the exact files either package.json or .travis.yml",
+				\ "[{package.json,.travis.yml}]",
+				\ "indent_style = space",
+				\ "indent_size = 2",
+				\ ]
+	call writefile(l:text, l:config)
+	echom "The file " . l:config . " was created"
 endfunction
 
 command! -nargs=0 CreateEditorConfig call s:create_editorconfig()
 
 function! s:create_git_config()
-  let l:config = fnamemodify(expand($HOME . '/.gitconfig'), ':p')
-  if filereadable(l:config)
-    echom "The file " . l:config . " exists."
-    return
-  endif
-  let l:text = [
-        \ "[user]",
-        \ "    name = Jerry Wang",
-        \ "    email = jerrywang1981@outlook.com",
-        \ "    signingkey = jerrywang1981@outlook.com",
-        \ "[commit]",
-        \ "    gpgsign = true",
-        \ "[tag]",
-        \ "    gpgSign = true",
-        \ "[pull]",
-        \ "    rebase = true",
-        \ ]
-  call writefile(l:text, l:config)
-  echom "The file " . l:config . " was created"
+	let l:config = fnamemodify(expand($HOME . '/.gitconfig'), ':p')
+	if filereadable(l:config)
+		echom "The file " . l:config . " exists."
+		return
+	endif
+	let l:text = [
+				\ "[user]",
+				\ "    name = Jerry Wang",
+				\ "    email = jerrywang1981@outlook.com",
+				\ "    signingkey = jerrywang1981@outlook.com",
+				\ "[commit]",
+				\ "    gpgsign = true",
+				\ "[tag]",
+				\ "    gpgSign = true",
+				\ "[pull]",
+				\ "    rebase = true",
+				\ ]
+	call writefile(l:text, l:config)
+	echom "The file " . l:config . " was created"
 endfunction
 
 command! -nargs=0 CreateGitConfig call s:create_git_config()
@@ -663,22 +663,22 @@ nnoremap <silent> <leader>fq :<c-u>call <SID>FzfQuickfixFilter()<CR>
 "nnoremap <silent> <leader>fgw :<c-u>RG <c-r><c-w><CR>
 
 function! s:build_quickfix_list(lines)
-  call setqflist(map(copy(a:lines), '{ "filename": v:val  }'))
-  copen
-  cc
+	call setqflist(map(copy(a:lines), '{ "filename": v:val  }'))
+	copen
+	cc
 endfunction
 
 let g:fzf_action = {
-      \ 'ctrl-q': function('s:build_quickfix_list'),
-      \ 'ctrl-x': 'split',
-      \ 'ctrl-v': 'vsplit'}
+			\ 'ctrl-q': function('s:build_quickfix_list'),
+			\ 'ctrl-x': 'split',
+			\ 'ctrl-v': 'vsplit'}
 
 let $FZF_DEFAULT_OPTS = '--bind ctrl-a:select-all,ctrl-q:select-all+accept'
 
 if executable('fd')
-  let $FZF_DEFAULT_COMMAND = 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
+	let $FZF_DEFAULT_COMMAND = 'fd --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
 elseif executable('fdfind')
-  let $FZF_DEFAULT_COMMAND = 'fdfind --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
+	let $FZF_DEFAULT_COMMAND = 'fdfind --type f --strip-cwd-prefix --hidden --follow --exclude .git --ignore-file .gitignore'
 endif
 
 let g:fzf_layout = { 'window': { 'width': 0.9, 'height': 0.95, 'relative': v:true  }  }
@@ -688,26 +688,26 @@ let g:fzf_vim.preview_window = ['up,50%', 'ctrl-/'] " actually in windows it is 
 
 
 function! RgRunner(...)
-  let command = 'rg --column --line-number --no-heading --color=always --smart-case '
-  if a:0 == 1
-    return command . ' -- ' . a:1
-  endif
+	let command = 'rg --column --line-number --no-heading --color=always --smart-case '
+	if a:0 == 1
+		return command . ' -- ' . a:1
+	endif
 
-  let args = copy(a:000)
-  let sArgs = split(join(args, ' '), ' -- ')
-  if len(sArgs) == 2
-    let command = command . sArgs[1] . ' -- ' . sArgs[0]
-  else
-    let command = command . join(args, ' ')
-  endif
-  return command
+	let args = copy(a:000)
+	let sArgs = split(join(args, ' '), ' -- ')
+	if len(sArgs) == 2
+		let command = command . sArgs[1] . ' -- ' . sArgs[0]
+	else
+		let command = command . join(args, ' ')
+	endif
+	return command
 endfunction
 
 
 if executable('rg')
-  command! -bang -nargs=* Rg1 call fzf#vim#grep(RgRunner(<f-args>), fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}), <bang>0)
-  command! -bang -nargs=* RgAll call fzf#vim#grep2("rg --column --line-number --no-heading --color=always --smart-case --no-ignore --hidden -- ", <q-args>, fzf#vim#with_preview(), <bang>0)
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
+	command! -bang -nargs=* Rg1 call fzf#vim#grep(RgRunner(<f-args>), fzf#vim#with_preview({'options': '--delimiter : --nth 4..'}), <bang>0)
+	command! -bang -nargs=* RgAll call fzf#vim#grep2("rg --column --line-number --no-heading --color=always --smart-case --no-ignore --hidden -- ", <q-args>, fzf#vim#with_preview(), <bang>0)
+	set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case
 endif
 
 " neoformat
@@ -734,52 +734,52 @@ vnoremap <silent> <leader>fSl <cmd>FloatermSend<cr>
 "big files
 
 function! s:check_big_file(uri, bufnr)
-  if empty(a:uri) || empty(a:bufnr)
-    return
-  endif
+	if empty(a:uri) || empty(a:bufnr)
+		return
+	endif
 
-  let l:bufnr = str2nr(a:bufnr)
-  let l:ft = getbufvar(l:bufnr, '&filetype', '')
-  if l:ft == 'bigfile'
-    return
-  endif
-  let l:bufname = bufname(l:bufnr)
-  if l:bufname != a:uri
-    return
-  endif
-  let l:bigfile = v:false
-  let l:size = getfsize(l:bufname)
-  if l:size <= 0
-    return
-  elseif l:size > 1.5 * 1024 * 1024
-    let l:bigfile = v:true
-  else
-    let l:bufinfo = getbufinfo(l:bufname)
-    if empty(l:bufinfo)
-      return
-    endif
-    if l:bufinfo[0].linecount > 20000
-      let l:bigfile = v:true
-    endif
-  endif
+	let l:bufnr = str2nr(a:bufnr)
+	let l:ft = getbufvar(l:bufnr, '&filetype', '')
+	if l:ft == 'bigfile'
+		return
+	endif
+	let l:bufname = bufname(l:bufnr)
+	if l:bufname != a:uri
+		return
+	endif
+	let l:bigfile = v:false
+	let l:size = getfsize(l:bufname)
+	if l:size <= 0
+		return
+	elseif l:size > 1.5 * 1024 * 1024
+		let l:bigfile = v:true
+	else
+		let l:bufinfo = getbufinfo(l:bufname)
+		if empty(l:bufinfo)
+			return
+		endif
+		if l:bufinfo[0].linecount > 20000
+			let l:bigfile = v:true
+		endif
+	endif
 
-  if l:bigfile
-    let l:answer = input("Do you want to enable bigfile for this buffer? (y/N):")
-    if l:answer == "y"
-      execute "NoMatchParen"
-      call setbufvar(l:bufnr, '&filetype', 'bigfile')
-      call setbufvar(l:bufnr, '&syntax', l:ft)
-      call setbufvar(l:bufnr, '&foldmethod', 'manual')
-      call setbufvar(l:bufnr, '&conceallevel', 0)
-      call setbufvar(l:bufnr, '&wrap', v:false)
-      call setbufvar(l:bufnr, '&foldenable', v:false)
-    endif
-  endif
+	if l:bigfile
+		let l:answer = input("Do you want to enable bigfile for this buffer? (y/N):")
+		if l:answer == "y"
+			execute "NoMatchParen"
+			call setbufvar(l:bufnr, '&filetype', 'bigfile')
+			call setbufvar(l:bufnr, '&syntax', l:ft)
+			call setbufvar(l:bufnr, '&foldmethod', 'manual')
+			call setbufvar(l:bufnr, '&conceallevel', 0)
+			call setbufvar(l:bufnr, '&wrap', v:false)
+			call setbufvar(l:bufnr, '&foldenable', v:false)
+		endif
+	endif
 endfunction
 
 augroup bigfile
-  au!
-  autocmd FileType * call s:check_big_file(expand("<afile>"), expand("<abuf>"))
+	au!
+	autocmd FileType * call s:check_big_file(expand("<afile>"), expand("<abuf>"))
 augroup END
 
 "undotree
@@ -809,89 +809,89 @@ let g:AutoPairsShortcutBackInsert=''
 
 " vim-lsp-settings
 let g:lsp_settings = {
-      \  'typescript-language-server': {
-      \     'root_uri_patterns': ['.git']
-      \  },
-      \ 'eclipse-jdt-ls': {
-      \   'initialization_options': {
-      \     'extendedClientCapabilities': { 'classFileContentsSupport': v:true },
-      \     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1)
-      \     },
-      \     'root_uri_patterns': ['.git']
-      \   }
-      \  }
+			\  'typescript-language-server': {
+			\     'root_uri_patterns': ['.git']
+			\  },
+			\ 'eclipse-jdt-ls': {
+			\   'initialization_options': {
+			\     'extendedClientCapabilities': { 'classFileContentsSupport': v:true,  'overrideMethodsPromptSupport': v:true  },
+			\     'bundles': glob(data_dir . '/plugged/vimspector/gadgets/*/vscode-java-debug/server/com.microsoft.java.debug.plugin-*.jar', 1, 1)
+			\     },
+			\     'root_uri_patterns': ['.git']
+			\   }
+			\  }
 
 let g:lsp_settings_filetype_typescript = ["vtsls", "typescript-language-server"]
 let g:lsp_settings_filetype_vue = ["volar-server", "vtsls"]
 
 if has('python3')
-  " vimspector
-  let g:vimspector_enable_mappings = 'HUMAN'
-  let g:vimspector_java_hotcodereplace_mode = 'always'
+	" vimspector
+	let g:vimspector_enable_mappings = 'HUMAN'
+	let g:vimspector_java_hotcodereplace_mode = 'always'
 
-  " for normal mode - the word under the cursor
-  nmap <Leader>di <Plug>VimspectorBalloonEval
-  " for visual mode, the visually selected text
-  xmap <Leader>di <Plug>VimspectorBalloonEval
+	" for normal mode - the word under the cursor
+	nmap <Leader>di <Plug>VimspectorBalloonEval
+	" for visual mode, the visually selected text
+	xmap <Leader>di <Plug>VimspectorBalloonEval
 
-  nmap <space>Dtb <Plug>VimspectorBreakpoints
-  nmap <space>Dtc <cmd>VimspectorShowOutput<cr>
+	nmap <space>Dtb <Plug>VimspectorBreakpoints
+	nmap <space>Dtc <cmd>VimspectorShowOutput<cr>
 
-  function! <SID>StartJavaDebug() abort
-    let l:command_name =  'vscode.java.startDebugSession'
-    let l:server_name = 'eclipse-jdt-ls'
-    let l:bufnr = -1
-    let l:sync = v:true  "get(a:params, 'sync', v:true)
+	function! <SID>StartJavaDebug() abort
+		let l:command_name =  'vscode.java.startDebugSession'
+		let l:server_name = 'eclipse-jdt-ls'
+		let l:bufnr = -1
+		let l:sync = v:true  "get(a:params, 'sync', v:true)
 
-    " create command.
-    let l:command = { 'command': l:command_name }
+		" create command.
+		let l:command = { 'command': l:command_name }
 
-    let l:servers = lsp#get_allowed_servers()
-    " execute command on server.
-    if !empty(l:server_name)
-      call lsp#send_request(l:server_name, {
-            \   'method': 'workspace/executeCommand',
-            \   'params': l:command,
-            \   'sync': l:sync,
-            \   'on_notification': function('s:handle_execute_command', [l:server_name, l:command]),
-            \ })
-    endif
-  endfunction
+		let l:servers = lsp#get_allowed_servers()
+		" execute command on server.
+		if !empty(l:server_name)
+			call lsp#send_request(l:server_name, {
+						\   'method': 'workspace/executeCommand',
+						\   'params': l:command,
+						\   'sync': l:sync,
+						\   'on_notification': function('s:handle_execute_command', [l:server_name, l:command]),
+						\ })
+		endif
+	endfunction
 
-  function! s:handle_execute_command(server_name, command, data) abort
-    if lsp#client#is_error(a:data['response'])
-      call lsp#utils#error('Execute command failed on ' . a:server_name . ': ' . string(a:command) . ' -> ' . string(a:data))
-    endif
-    let l:dap_port = a:data['response']['result']
-    call vimspector#Launch(v:false, { 'DAPPort': l:dap_port  },
-          \ {
-          \    "Java Attach": {
-          \      "adapter": "vscode-java",
-          \      "filetypes": [
-          \        "java"
-          \      ],
-          \      "configuration": {
-          \        "request": "attach",
-          \        "hostName": "127.0.0.1",
-          \        "port": "5005",
-          \        "sourcePaths": [
-          \          "${workspaceRoot}/src/main/java",
-          \          "${workspaceRoot}/src/test/java"
-          \        ],
-          \        "breakpoints": {
-          \          "exception": {
-          \            "caught": "N",
-          \            "uncaught": "N"
-          \          }
-          \        }
-          \      }
-          \    }
-          \}
-          \)
-  endfunction
+	function! s:handle_execute_command(server_name, command, data) abort
+		if lsp#client#is_error(a:data['response'])
+			call lsp#utils#error('Execute command failed on ' . a:server_name . ': ' . string(a:command) . ' -> ' . string(a:data))
+		endif
+		let l:dap_port = a:data['response']['result']
+		call vimspector#Launch(v:false, { 'DAPPort': l:dap_port  },
+					\ {
+					\    "Java Attach": {
+					\      "adapter": "vscode-java",
+					\      "filetypes": [
+					\        "java"
+					\      ],
+					\      "configuration": {
+					\        "request": "attach",
+					\        "hostName": "127.0.0.1",
+					\        "port": "5005",
+					\        "sourcePaths": [
+					\          "${workspaceRoot}/src/main/java",
+					\          "${workspaceRoot}/src/test/java"
+					\        ],
+					\        "breakpoints": {
+					\          "exception": {
+					\            "caught": "N",
+					\            "uncaught": "N"
+					\          }
+					\        }
+					\      }
+					\    }
+					\}
+					\)
+	endfunction
 
-  autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
-  " autocmd FileType java nnoremap <silent> <buffer> <F5> :call <SID>StartJavaDebug()<CR>
+	autocmd FileType java nnoremap <silent> <buffer> <leader><F5> :call <SID>StartJavaDebug()<CR>
+	" autocmd FileType java nnoremap <silent> <buffer> <F5> :call <SID>StartJavaDebug()<CR>
 endif
 
 " vim-filelist
@@ -913,89 +913,89 @@ endif
 " quickfix window
 
 function! s:qf_delete(line1, line2)
-  let l:min = min([a:line1, a:line2])
-  if l:min < 1
-    echom "line number should be greater than 1"
-    return
-  endif
-  let l:lines = sort([a:line1, a:line2])
-  let l:list = copy(getqflist())
+	let l:min = min([a:line1, a:line2])
+	if l:min < 1
+		echom "line number should be greater than 1"
+		return
+	endif
+	let l:lines = sort([a:line1, a:line2])
+	let l:list = copy(getqflist())
 
-  if l:lines[0] == 1
-    let l:list = l:list[l:lines[1]:]
-  elseif l:lines[1] == len(l:list)
-    let l:list = l:list[:l:lines[0]-2]
-  else
-    let l:list = l:list[:l:lines[0]-2] + l:list[l:lines[1]:]
-  endif
-  call setqflist(l:list)
-  if len(l:list) > 0
-    call execute(l:lines[0] > len(l:list) ? len(l:list) : l:lines[0])
-  endif
+	if l:lines[0] == 1
+		let l:list = l:list[l:lines[1]:]
+	elseif l:lines[1] == len(l:list)
+		let l:list = l:list[:l:lines[0]-2]
+	else
+		let l:list = l:list[:l:lines[0]-2] + l:list[l:lines[1]:]
+	endif
+	call setqflist(l:list)
+	if len(l:list) > 0
+		call execute(l:lines[0] > len(l:list) ? len(l:list) : l:lines[0])
+	endif
 endfunction
 
 function s:Qf_Lambda_filter(k, val)
-  return  bufname(a:val["bufnr"]) .. ":" .. a:val["lnum"] .. ":" ..
-        \ a:val["col"] .. ":" .. a:val["text"]
+	return  bufname(a:val["bufnr"]) .. ":" .. a:val["lnum"] .. ":" ..
+				\ a:val["col"] .. ":" .. a:val["text"]
 endfunction
 
 function! <SID>FzfQuickfixFilter()
-  if !exists("*fzf#run") || !exists("*fzf#wrap")
-    return
-  endif
+	if !exists("*fzf#run") || !exists("*fzf#wrap")
+		return
+	endif
 
-  let l:qf_list = copy(getqflist())
-  if len(l:qf_list) == 0
-    return
-  endif
+	let l:qf_list = copy(getqflist())
+	if len(l:qf_list) == 0
+		return
+	endif
 
-  let l:qf_list_source = mapnew(l:qf_list, function('s:Qf_Lambda_filter'))
+	let l:qf_list_source = mapnew(l:qf_list, function('s:Qf_Lambda_filter'))
 
-  function! s:FzfQuickfixFilter_S(lines) closure
-    if len(a:lines) == 0
-      return
-    endif
-    call filter(l:qf_list, { _, val ->
-          \ index(a:lines, s:Qf_Lambda_filter(1, val)) >= 0
-          \ })
-    if len(l:qf_list) < 1
-      return
-    endif
-    call setqflist(l:qf_list)
+	function! s:FzfQuickfixFilter_S(lines) closure
+		if len(a:lines) == 0
+			return
+		endif
+		call filter(l:qf_list, { _, val ->
+					\ index(a:lines, s:Qf_Lambda_filter(1, val)) >= 0
+					\ })
+		if len(l:qf_list) < 1
+			return
+		endif
+		call setqflist(l:qf_list)
 
-    try
-      let l:first = l:qf_list[0]
-      execute "buffer " .. l:first["bufnr"]
-      execute l:first["lnum"]
-      if has_key(l:first, 'col')
-        call cursor(0, l:first["col"])
-      endif
-      normal! zvzz
-    catch
-    endtry
-  endfunction
+		try
+			let l:first = l:qf_list[0]
+			execute "buffer " .. l:first["bufnr"]
+			execute l:first["lnum"]
+			if has_key(l:first, 'col')
+				call cursor(0, l:first["col"])
+			endif
+			normal! zvzz
+		catch
+		endtry
+	endfunction
 
-  call fzf#run(fzf#wrap({
-        \ 'source': l:qf_list_source,
-        \ 'sink*': function("s:FzfQuickfixFilter_S"),
-        \ 'options': ['--ansi', '--multi',
-        \ '--prompt', 'Quickfix>',
-        \ '--bind', 'ctrl-a:select-all']
-        \ }))
+	call fzf#run(fzf#wrap({
+				\ 'source': l:qf_list_source,
+				\ 'sink*': function("s:FzfQuickfixFilter_S"),
+				\ 'options': ['--ansi', '--multi',
+				\ '--prompt', 'Quickfix>',
+				\ '--bind', 'ctrl-a:select-all']
+				\ }))
 
 endfunction
 
 " command! -nargs=0 Qfilter call <SID>FzfQuickfixFilter()
 
 function! s:on_qf_open() abort
-  command! -buffer -range -nargs=0 QfDelete call s:qf_delete(<line1>, <line2>)
-  nmap <buffer> dd <cmd>QfDelete<cr>
-  map <buffer> gq <cmd>cclose<cr>
+	command! -buffer -range -nargs=0 QfDelete call s:qf_delete(<line1>, <line2>)
+	nmap <buffer> dd <cmd>QfDelete<cr>
+	map <buffer> gq <cmd>cclose<cr>
 endfunction
 
 augroup QuickfixAuGroup
-  autocmd!
-  autocmd FileType qf call s:on_qf_open()
+	autocmd!
+	autocmd FileType qf call s:on_qf_open()
 augroup END
 
 
@@ -1005,8 +1005,8 @@ let g:lsp_fold_enabled = 0
 let g:lsp_format_sync_timeout = 1000
 " let g:lsp_inlay_hints_enabled = 1
 let g:lsp_inlay_hints_mode = {
-      \  'normal': ['curline'],
-      \}
+			\  'normal': ['curline'],
+			\}
 
 let g:lsp_document_code_action_signs_hint = {'text': '🚀'}
 let g:lsp_diagnostics_signs_error = {'text': '🚨'}
@@ -1020,36 +1020,99 @@ let g:lsp_diagnostics_virtual_text_align = "right"
 " let g:lsp_log_file = expand('~/vim-lsp.log')
 
 function! s:on_lsp_buffer_enabled() abort
-  setlocal omnifunc=lsp#complete
-  setlocal signcolumn=yes
-  if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
-  nmap <buffer> <c-]> <plug>(lsp-definition)
-  nmap <buffer> gd <plug>(lsp-declaration)
-  nmap <buffer> gs <plug>(lsp-document-symbol-search)
-  nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
-  nmap <buffer> grr <plug>(lsp-references)
-  nmap <buffer> gri <plug>(lsp-implementation)
-  " nmap <buffer> gt <plug>(lsp-type-definition)
-  nmap <buffer> grn <plug>(lsp-rename)
-  nmap <buffer> gra <plug>(lsp-code-action)
-  nmap <buffer> [d <plug>(lsp-previous-diagnostic)
-  nmap <buffer> ]d <plug>(lsp-next-diagnostic)
-  nmap <buffer> K <plug>(lsp-hover)
+	setlocal omnifunc=lsp#complete
+	setlocal signcolumn=yes
+	if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+	nmap <buffer> <c-]> <plug>(lsp-definition)
+	nmap <buffer> gd <plug>(lsp-declaration)
+	nmap <buffer> gs <plug>(lsp-document-symbol-search)
+	nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+	nmap <buffer> grr <plug>(lsp-references)
+	nmap <buffer> gri <plug>(lsp-implementation)
+	" nmap <buffer> gt <plug>(lsp-type-definition)
+	nmap <buffer> grn <plug>(lsp-rename)
+	nmap <buffer> gra <plug>(lsp-code-action)
+	nmap <buffer> [d <plug>(lsp-previous-diagnostic)
+	nmap <buffer> ]d <plug>(lsp-next-diagnostic)
+	nmap <buffer> K <plug>(lsp-hover)
 
-  let l:servers = filter(lsp#get_allowed_servers(), 'lsp#capabilities#has_document_formatting_provider(v:val)')
-  if len(l:servers) != 0
-    nmap <buffer> <leader>= <plug>(lsp-document-format)
-    vmap <buffer> <leader>= <plug>(lsp-document-range-format)
-  endif
-  " autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+	let l:servers = filter(lsp#get_allowed_servers(), 'lsp#capabilities#has_document_formatting_provider(v:val)')
+	if len(l:servers) != 0
+		nmap <buffer> <leader>= <plug>(lsp-document-format)
+		vmap <buffer> <leader>= <plug>(lsp-document-range-format)
+	endif
+	" autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
 
-  " refer to doc to add more commands
+	" refer to doc to add more commands
+endfunction
+
+let s:eclipse_lsp_init = 0
+function! s:eclipse_lsp() abort
+	if s:eclipse_lsp_init > 0 | return | endif
+	let s:eclipse_lsp_init = 1
+
+	function s:override_methods_prompt_handler_accept_action(data)
+    let l:result = get(a:data['response'], 'result', {})
+    if empty(l:result) | return | endif
+		call lsp#utils#workspace_edit#apply_workspace_edit(l:result)
+	endfunction
+
+	function s:override_methods_prompt_handler_accept(server, ctx, data, ...)
+		call lsp#internal#ui#quickpick#close()
+		if empty(a:data['items']) | return | endif
+		let l:selected = a:data['items'][0]['item']
+		call lsp#send_request(a:server, {
+					\ 'method': 'java/addOverridableMethods',
+					\ 'params' : {'context': a:ctx, 'overridableMethods': [l:selected]},
+					\ 'on_notification': function('s:override_methods_prompt_handler_accept_action')
+					\ })
+	endfunction
+
+	function s:override_methods_prompt_handler(server, ctx, data)
+    let l:result = get(a:data['response'], 'result', {})
+		" let l:methods = a:data['response']['result']['methods']
+		let l:methods = get(l:result, 'methods', [])
+    if empty(l:methods) | return | endif
+		let l:items = []
+		for l:method in l:methods
+			call add(l:items, { 'title': printf("%s(%s) class: %s", l:method['name'], join(l:method['parameters'], ", ") , l:method['declaringClass']), 'item': l:method })
+		endfor
+
+		call lsp#internal#ui#quickpick#open({
+					\ 'items': l:items,
+					\ 'key': 'title',
+					\ 'on_accept': function('s:override_methods_prompt_handler_accept', [a:server, a:ctx])
+					\ })
+	endfunction
+
+
+	function! s:override_methods_prompt(context)
+		let l:bufnr = get(a:context, 'bufnr', 0)
+		let l:command = get(a:context, 'command', {})
+		let l:arguments = get(l:command, 'arguments', [])
+		if empty(l:arguments) | return | endif
+		let l:params = l:arguments[0]
+		let l:servers = lsp#get_allowed_servers()
+		if empty(l:servers) | return | endif
+		for l:server in l:servers
+			call lsp#send_request(l:server, {
+						\ 'method': 'java/listOverridableMethods',
+						\ 'params' : l:params,
+						\ 'on_notification': function('s:override_methods_prompt_handler', [l:server, l:params])
+						\ })
+		endfor
+	endfunction
+
+	if exists('*lsp#register_command')
+		call lsp#register_command('java.action.overrideMethodsPrompt', function('s:override_methods_prompt'))
+	endif
 endfunction
 
 augroup lsp_install
-  au!
-  " call s:on_lsp_buffer_enabled only for languages that has the server registered.
-  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+	au!
+	" call s:on_lsp_buffer_enabled only for languages that has the server registered.
+	autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+	autocmd User lsp_buffer_enabled call s:eclipse_lsp()
 augroup END
 
 " asyncomplete.vim
@@ -1062,41 +1125,41 @@ autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
 
 function! s:sort_by_priority_preprocessor(options, matches) abort
-  let l:items = []
-  for [l:source_name, l:matches] in items(a:matches)
-    for l:item in l:matches['items']
-      if stridx(l:item['word'], a:options['base']) == 0
-        let l:item['priority'] =
-              \ get(asyncomplete#get_source_info(l:source_name),'priority',0)
-        call add(l:items, l:item)
-      endif
-    endfor
-  endfor
+	let l:items = []
+	for [l:source_name, l:matches] in items(a:matches)
+		for l:item in l:matches['items']
+			if stridx(l:item['word'], a:options['base']) == 0
+				let l:item['priority'] =
+							\ get(asyncomplete#get_source_info(l:source_name),'priority',0)
+				call add(l:items, l:item)
+			endif
+		endfor
+	endfor
 
-  let l:items = sort(l:items, {a, b -> b['priority'] - a['priority']})
+	let l:items = sort(l:items, {a, b -> b['priority'] - a['priority']})
 
-  call asyncomplete#preprocess_complete(a:options, l:items)
+	call asyncomplete#preprocess_complete(a:options, l:items)
 endfunction
 
 let g:asyncomplete_preprocessor = [function('s:sort_by_priority_preprocessor')]
 
 au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#buffer#get_source_options({
-      \ 'name': 'buffer',
-      \ 'allowlist': ['*'],
-      \ 'blocklist': ['go'],
-      \ 'priority': 100,
-      \ 'completor': function('asyncomplete#sources#buffer#completor'),
-      \ 'config': {
-      \    'max_buffer_size': 5000000,
-      \  },
-      \ }))
+			\ 'name': 'buffer',
+			\ 'allowlist': ['*'],
+			\ 'blocklist': ['go'],
+			\ 'priority': 100,
+			\ 'completor': function('asyncomplete#sources#buffer#completor'),
+			\ 'config': {
+			\    'max_buffer_size': 5000000,
+			\  },
+			\ }))
 
 au User asyncomplete_setup call asyncomplete#register_source(asyncomplete#sources#file#get_source_options({
-      \ 'name': 'file',
-      \ 'allowlist': ['*'],
-      \ 'priority': 10,
-      \ 'completor': function('asyncomplete#sources#file#completor')
-      \ }))
+			\ 'name': 'file',
+			\ 'allowlist': ['*'],
+			\ 'priority': 10,
+			\ 'completor': function('asyncomplete#sources#file#completor')
+			\ }))
 
 " disable auto enabled linter
 " let g:lsp_ale_auto_enable_linter = v:false
@@ -1118,73 +1181,73 @@ nnoremap <silent> <space> :<c-u>WhichKey  '<space>'<CR>
 
 let g:which_key_map_leader = {}
 let g:which_key_map_leader.h = {
-      \'name': '+hunk',
-      \'p': 'preview',
-      \'s': 'stage',
-      \'u': 'undo',
-      \ }
+			\'name': '+hunk',
+			\'p': 'preview',
+			\'s': 'stage',
+			\'u': 'undo',
+			\ }
 
 let g:which_key_map_leader.e = {
-      \'name': '+edit',
-      \'v': 'Vim configuation file',
-      \'t': 'Todo list',
-      \'n': 'Note',
-      \}
+			\'name': '+edit',
+			\'v': 'Vim configuation file',
+			\'t': 'Todo list',
+			\'n': 'Note',
+			\}
 
 let g:which_key_map_leader.f = {
-      \'name': '+fzf/floaterm',
-      \'b': 'Buffers',
-      \'f': 'Find files',
-      \'h': 'Histories',
-      \'q': 'Quickfix',
-      \'g': {
-      \   'name': '+grep',
-      \   'g': 'Git files',
-      \   'h': 'all files',
-      \   '/': 'Buffer lines',
-      \   'S': 'Sessions',
-      \   'B': 'Browser Bookmarks',
-      \  }
-      \}
+			\'name': '+fzf/floaterm',
+			\'b': 'Buffers',
+			\'f': 'Find files',
+			\'h': 'Histories',
+			\'q': 'Quickfix',
+			\'g': {
+			\   'name': '+grep',
+			\   'g': 'Git files',
+			\   'h': 'all files',
+			\   '/': 'Buffer lines',
+			\   'S': 'Sessions',
+			\   'B': 'Browser Bookmarks',
+			\  }
+			\}
 
 call which_key#register(',', "g:which_key_map_leader")
 
 let g:which_key_map_space = {
-      \ '1': 'File tree',
-      \ '4': 'Terminal',
-      \ '7': 'Undo tree',
-      \ }
+			\ '1': 'File tree',
+			\ '4': 'Terminal',
+			\ '7': 'Undo tree',
+			\ }
 let g:which_key_map_space.e = { 'name': '+enable' }
 let g:which_key_map_space.d = { 'name': '+disable' }
 
 if has('python3')
-  let g:which_key_map_space.D = {
-        \ 'name': '+debug',
-        \ '<F3>': 'Stop',
-        \ '<F4>': 'Restart',
-        \ '<F5>': 'Start/Continue',
-        \ '<F6>': 'Pause',
-        \ '<F8>': 'Add function breakpoint',
-        \ '<leader><F8>': 'Run to cursor',
-        \ '<F9>': 'Toggle breakpoint',
-        \ '<leader><F9>': 'Toggle conditional breakpoint',
-        \ '<F10>': 'Step over',
-        \ '<F11>': 'Step into',
-        \ '<F12>': 'Step out',
-        \ }
+	let g:which_key_map_space.D = {
+				\ 'name': '+debug',
+				\ '<F3>': 'Stop',
+				\ '<F4>': 'Restart',
+				\ '<F5>': 'Start/Continue',
+				\ '<F6>': 'Pause',
+				\ '<F8>': 'Add function breakpoint',
+				\ '<leader><F8>': 'Run to cursor',
+				\ '<F9>': 'Toggle breakpoint',
+				\ '<leader><F9>': 'Toggle conditional breakpoint',
+				\ '<F10>': 'Step over',
+				\ '<F11>': 'Step into',
+				\ '<F12>': 'Step out',
+				\ }
 
-  let g:which_key_map_space.D.t = {
-        \ 'name': '+toggle',
-        \ 'b' : 'Breakpoint view',
-        \ 'c' : 'Console',
-        \ }
+	let g:which_key_map_space.D.t = {
+				\ 'name': '+toggle',
+				\ 'b' : 'Breakpoint view',
+				\ 'c' : 'Console',
+				\ }
 endif
 
 let g:which_key_map_space.t = {
-      \ 'name': '+toggle',
-      \ 'm': 'markdown preview',
-      \ 'd': 'database ui',
-      \ }
+			\ 'name': '+toggle',
+			\ 'm': 'markdown preview',
+			\ 'd': 'database ui',
+			\ }
 
 " if has('sound')
 "   nnoremap <silent> <space>tk <cmd>KeyStrokeToggle<cr>
@@ -1192,25 +1255,25 @@ let g:which_key_map_space.t = {
 " endif
 
 let g:which_key_map_space.b = {
-      \'name': '+buffers',
-      \'b': 'which buffer to go',
-      \'1': 'Go to buffer 1',
-      \'2': 'Go to buffer 2',
-      \'3': 'Go to buffer 3',
-      \'4': 'Go to buffer 4',
-      \'5': 'Go to buffer 5',
-      \'6': 'Go to buffer 6',
-      \'7': 'Go to buffer 7',
-      \'8': 'Go to buffer 8',
-      \'9': 'Go to buffer 9',
-      \'0': 'Go to buffer 10',
-      \ }
+			\'name': '+buffers',
+			\'b': 'which buffer to go',
+			\'1': 'Go to buffer 1',
+			\'2': 'Go to buffer 2',
+			\'3': 'Go to buffer 3',
+			\'4': 'Go to buffer 4',
+			\'5': 'Go to buffer 5',
+			\'6': 'Go to buffer 6',
+			\'7': 'Go to buffer 7',
+			\'8': 'Go to buffer 8',
+			\'9': 'Go to buffer 9',
+			\'0': 'Go to buffer 10',
+			\ }
 
 call which_key#register('<Space>', "g:which_key_map_space")
 
 function! <SID>UnmapFormat()
-  silent! unmap <leader>=
-  silent! unmap <buffer> <localleader>=
+	silent! unmap <leader>=
+	silent! unmap <buffer> <localleader>=
 endfunction
 
 command! -nargs=0 FormatDisable call <SID>UnmapFormat()
