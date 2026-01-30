@@ -713,10 +713,11 @@ endif
 " neoformat
 "let g:neoformat_try_formatprg = 1
 let g:neoformat_try_node_exe = 1
-let g:neoformat_enabled_javascript = ['prettier']
-let g:neoformat_enabled_typescript = ['prettier']
-let g:neoformat_enabled_html = ['prettier']
-let g:neoformat_enabled_markdown = ['prettier']
+" prettierd
+" let g:neoformat_enabled_javascript = ['prettier']
+" let g:neoformat_enabled_typescript = ['prettier']
+" let g:neoformat_enabled_html = ['prettier']
+" let g:neoformat_enabled_markdown = ['prettier']
 nmap <leader>= <cmd>Neoformat<CR>
 
 " vim-floaterm
@@ -1037,7 +1038,7 @@ function! s:on_lsp_buffer_enabled() abort
 	nmap <buffer> K <plug>(lsp-hover)
 
 	let l:servers = filter(lsp#get_allowed_servers(), 'lsp#capabilities#has_document_formatting_provider(v:val)')
-	if len(l:servers) != 0
+	if len(l:servers) != 0 && &ft != 'vue' && &ft != 'javascript' && &ft != 'typescript'
 		nmap <buffer> <leader>= <plug>(lsp-document-format)
 		vmap <buffer> <leader>= <plug>(lsp-document-range-format)
 	endif
