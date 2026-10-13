@@ -1290,8 +1290,13 @@ nnoremap <silent> <space>tm <cmd>MarkdownPreviewToggle<cr>
 
 " abbreviation
 iab jw Jerry Wang <jerrywang1981@outlook.com>
+iab jwf Jerry Wang <jerry223@foxmail.com>
 iab jwi Jerry Wang <jianjunw@cn.ibm.com>
 iab jwc  .--- . .-. .-. -.--  .-- .- -. --.
+iab <expr> dts strftime("%c")
+iab <expr> dtd strftime("%Y/%m/%d")
+iab <expr> dtt strftime("%H:%M:%S")
+iab <expr> dta strftime("%Y/%m/%d %H:%M:%S")
 
 " java debug
 " java -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=1808 Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=xx.xx.xxx.xx -Dcom.sun.management.jmxremote.rmi.port=1808 -jar app.jar
